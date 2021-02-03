@@ -10,6 +10,8 @@
     "start": "node dist/app.js",
     "start:watch": "nodemon dist/app.js",
     "watch": "concurrently -k -p \"[{name}]\" -n \"TypeScript,Node\" -c \"yellow.bold,cyan.bold,green.bold\"  \"npm run build:watch\" \"npm run start:watch\"",
+    "dev": "tsnd --respawn src/app.ts",
+    "initModels": "ts-node ./scripts/db-init-models.ts",
     "lint": "eslint . --ext .js,.ts && tsc --noEmit --incremental false --pretty",
     "lint:autofix": "eslint . --ext .js,.ts --fix",
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -26,11 +28,15 @@
   },
   "homepage": "https://github.com/Geksanit/nodejs-web-server#readme",
   "dependencies": {
+    "@types/express": "^4.17.11",
     "@types/node": "^14.14.14",
     "concurrently": "^5.3.0",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
     "nodemon": "^2.0.6",
     "pg": "^8.5.1",
     "sequelize": "^6.5.0",
+    "ts-node": "^9.1.1",
     "typescript": "^4.1.3"
   },
   "devDependencies": {
@@ -42,6 +48,7 @@
     "eslint-plugin-jsx-a11y": "^6.4.1",
     "eslint-plugin-prettier": "^3.3.0",
     "eslint-plugin-react": "^7.21.5",
-    "prettier": "^2.2.1"
+    "prettier": "^2.2.1",
+    "ts-node-dev": "^1.1.1"
   }
 }
