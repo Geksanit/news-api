@@ -1,9 +1,9 @@
 import express from 'express';
 import { Sequelize } from 'sequelize/types';
 
-import { createErrorHandler } from '../../middlewares/errorHandler';
+import { HttpError } from '../../utils/Errors';
 import { createLogger } from '../../middlewares/logger';
-import { createCategoryModel } from '../../models/category';
+import { createCategoryModel, getCategoryFromInstance } from '../../models/category';
 
 export const makeRouter = (sequelize: Sequelize) => {
   const CategoryModel = createCategoryModel(sequelize);
@@ -13,16 +13,24 @@ export const makeRouter = (sequelize: Sequelize) => {
 
   router.get('/', async (req, res, next) => {
     try {
-      const users = await CategoryModel.findAll({ attributes: ['id', 'label'] });
-      res.json(users);
+      const categories = await CategoryModel.findAll({
+        attributes: ['id', 'label', 'parentCategoryId'],
+      });
+      res.json(categories);
     } catch (error) {
       next(error);
     }
   });
   router.post('/', async (req, res, next) => {
     try {
-      await CategoryModel.create(req.body);
-      res.send('created');
+      const parentCategory = await CategoryModel.findOne({
+        where: { id: req.body.parentCategoryId },
+      });
+      if (!parentCategory) {
+        throw new HttpError(400, 'not found parent category');
+      }
+      const instance = await CategoryModel.create(req.body);
+      res.status(201).send(getCategoryFromInstance(instance));
     } catch (error) {
       next(error);
     }
@@ -35,15 +43,31 @@ export const makeRouter = (sequelize: Sequelize) => {
       next(error);
     }
   });
-  router.delete('/', async (req, res, next) => {
+  router.delete('/:id', async (req, res, next) => {
     try {
-      await CategoryModel.destroy({ where: { id: req.body.id } });
+      const {
+        params: { id },
+      } = req;
+      const category = await CategoryModel.findOne({
+        where: { id },
+      });
+      if (!category) {
+        throw new HttpError(400, 'not found category');
+      }
+      const subcategories = await CategoryModel.findAll({
+        where: { parentCategoryId: id },
+      });
+      if (subcategories.length > 0) {
+        throw new HttpError(400, 'you cannot delete a category with subcategories');
+      }
+      await CategoryModel.destroy({
+        where: { id },
+      });
       res.send('deleted');
     } catch (error) {
       next(error);
     }
   });
 
-  router.use(createErrorHandler(module));
   return router;
 };

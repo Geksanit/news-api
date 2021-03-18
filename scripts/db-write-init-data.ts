@@ -2,15 +2,14 @@ import dotenv from 'dotenv';
 import { Sequelize } from 'sequelize';
 
 dotenv.config();
-import { createCategoryModel } from '../src/models/category';
+import { createCategoryModel, initialCategories } from '../src/models/category';
 
 const script = async () => {
-  console.log('db init models script started');
+  console.log('db initial data started');
   const sequelize = new Sequelize(process.env.DB_NAME, 'postgres', process.env.DB_PASS, {
     host: 'localhost',
     dialect: 'postgres',
   });
-  const modelCreators = [createCategoryModel];
   try {
     await sequelize.authenticate();
     console.log('Connection has been established successfully.');
@@ -19,13 +18,15 @@ const script = async () => {
     return;
   }
   try {
-    const models = modelCreators.map(creator => creator(sequelize));
-    const promises = models.map(m => m.sync({ alter: true }));
+    const CategoryModel = createCategoryModel(sequelize);
+    // await CategoryModel.drop();
+    await CategoryModel.sync({ force: true });
+    const promises = initialCategories.map(data => CategoryModel.create(data));
+
     const res = await Promise.all(promises);
-    // await sequelize.sync({ alter: true }); todo use
     console.log('script completed', res);
   } catch (error) {
-    console.error('sync error', error);
+    console.error('create error', error);
   }
 };
 

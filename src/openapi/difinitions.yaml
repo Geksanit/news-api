@@ -1,0 +1,58 @@
+openapi: 3.0.0
+info:
+  title: Definitions
+  version: 1.0.0
+paths: {}
+
+components:
+  parameters:
+    # Paging offset
+    OffsetParam:
+      name: offset
+      required: false
+      in: query
+      description: Paging offset
+      schema:
+        type: integer
+        minimum: 0
+        multipleOf: 10
+        default: 0
+    # Page size
+    LimitParam:
+      name: limit
+      required: false
+      in: query
+      description: Paging limit
+      schema:
+        type: integer
+        minimum: 10
+        maximum: 1000
+        multipleOf: 10
+        default: 20
+  schemas:
+    Category:
+      type: object
+      properties:
+        id: 
+          type: integer
+        parentCategoryId:
+          nullable: true
+          type: integer
+        label: 
+          type: string
+      required:
+        - id
+        - label
+        - parentCategoryId
+
+    CreateCategory:
+      type: object
+      properties:
+        parentCategoryId:
+          nullable: true
+          type: integer
+        label: 
+          type: string
+      required:
+        - label
+        - parentCategoryId

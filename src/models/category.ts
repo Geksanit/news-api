@@ -1,28 +1,77 @@
-import { Sequelize, Model, DataTypes, Optional } from 'sequelize';
+import { Sequelize, Model, DataTypes } from 'sequelize';
+import { Category, CreateCategory } from 'src/types/generated';
 
-export type CategoryType = 'politics' | 'business' | 'health' | 'sports';
-// enum categ {
-//   'politics',
-//   'business',
-//   'health',
-//   'sports',
-// }
-export type Category = {
-  id: number;
-  label: CategoryType;
-};
-
-interface CategoryCreationAttributes extends Optional<Category, 'id'> {}
-
-interface CategoryInstance extends Model<Category, CategoryCreationAttributes>, Category {}
+interface CategoryInstance extends Model<Category, CreateCategory>, Category {}
 
 export const createCategoryModel = (sequalize: Sequelize) =>
-  sequalize.define<CategoryInstance>('Category', {
-    id: {
-      primaryKey: true,
-      type: DataTypes.INTEGER,
+  sequalize.define<CategoryInstance>(
+    'Category',
+    {
+      id: {
+        type: DataTypes.INTEGER,
+        autoIncrement: true,
+        primaryKey: true,
+      },
+      parentCategoryId: {
+        type: DataTypes.INTEGER,
+        defaultValue: null,
+        allowNull: true,
+      },
+      label: {
+        type: DataTypes.STRING,
+        unique: true,
+        allowNull: false,
+      },
     },
-    label: {
-      type: DataTypes.ENUM('politics', 'business', 'health', 'sports'),
+    {
+      getterMethods: {
+        getData(this: CategoryInstance) {
+          const { label, id, parentCategoryId } = this;
+          return { label, id, parentCategoryId };
+        },
+      },
     },
-  });
+  );
+/**
+ * Category omit virtual attributes
+ */
+export const getCategoryFromInstance = ({
+  label,
+  id,
+  parentCategoryId,
+}: CategoryInstance): Category => ({
+  label,
+  id,
+  parentCategoryId,
+});
+
+export const initialCategories: CreateCategory[] = [
+  {
+    parentCategoryId: null,
+    label: 'politics',
+  },
+  {
+    parentCategoryId: null,
+    label: 'business',
+  },
+  {
+    parentCategoryId: null,
+    label: 'health',
+  },
+  {
+    parentCategoryId: null,
+    label: 'sports',
+  },
+  {
+    parentCategoryId: 3,
+    label: 'auto sport',
+  },
+  {
+    parentCategoryId: 4,
+    label: 'Formula 1',
+  },
+  {
+    parentCategoryId: 4,
+    label: 'Rally sport',
+  },
+];
