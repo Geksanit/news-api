@@ -1,8 +1,13 @@
+/* eslint-disable no-console */
+/* eslint-disable import/first */
 import dotenv from 'dotenv';
 import { Sequelize } from 'sequelize';
 
 dotenv.config();
+
 import { createCategoryModel } from '../src/models/category';
+import { createUserModel } from '../src/models/user';
+import { createAuthorModel } from '../src/models/author';
 
 const script = async () => {
   console.log('db init models script started');
@@ -10,7 +15,7 @@ const script = async () => {
     host: 'localhost',
     dialect: 'postgres',
   });
-  const modelCreators = [createCategoryModel];
+  const modelCreators = [createCategoryModel, createUserModel, createAuthorModel];
   try {
     await sequelize.authenticate();
     console.log('Connection has been established successfully.');

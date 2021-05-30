@@ -1,35 +1,35 @@
 openapi: 3.0.1
 info:
-  title: NewSite Rest API
-  description: Categories
+  title: Rest API Docs
+  description: Authors
   version: 1.0.0
 paths:
-  /categories/:
+  /authors/:
     get:
       tags:
-        - Category
-      summary: All available categories
+        - Authors
+      summary: List all available authors
       responses:
         200:
-          description: A list of categories.
+          description: A list of authors.
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: "difinitions.yaml#/components/schemas/Category"
+                  $ref: "difinitions.yaml#/components/schemas/Author"
         500:
           description: Unexpected Error
     post:
       tags:
-        - Category
-      summary: Add a new category
+        - Authors
+      summary: Add a new author
       requestBody:
-        description: Category create request
+        description: Author create request
         content:
           application/json:
             schema:
-              $ref: "difinitions.yaml#/components/schemas/CreateCategory"
+              $ref: "difinitions.yaml#/components/schemas/CreateAuthor"
         required: true
       responses:
         201:
@@ -37,21 +37,21 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "difinitions.yaml#/components/schemas/Category"
+                $ref: "difinitions.yaml#/components/schemas/Author"
         400:
           description: Invalid request provided
         500:
           description: Unexpected Error
     put:
       tags:
-        - Category
-      summary: Update category
+        - Authors
+      summary: Update author
       requestBody:
-        description: Category update request
+        description: Author update request
         content:
           application/json:
             schema:
-              $ref: "difinitions.yaml#/components/schemas/Category"
+              $ref: "difinitions.yaml#/components/schemas/Author"
         required: true
       responses:
         200:
@@ -61,18 +61,37 @@ paths:
         500:
           description: Unexpected Error
 
-  /categories/{id}:
-    delete:
+  /authors/{id}:
+    get:
       tags:
-        - Category
-      summary: Delete category
+        - Authors
+      summary: Get author
       parameters:
         - in: path
           name: id
           required: true
           schema: 
             type: integer
-          description: Category delete request
+      responses:
+        200:
+          description: get author by id
+          content:
+            application/json:
+              schema:
+                $ref: "difinitions.yaml#/components/schemas/Author"
+        500:
+          description: Unexpected Error
+    delete:
+      tags:
+        - Authors
+      summary: Delete author
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: 
+            type: integer
+          description: Author delete request
       responses:
         200:
           description: Successful operation

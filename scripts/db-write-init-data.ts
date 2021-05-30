@@ -1,8 +1,13 @@
+/* eslint-disable no-console */
+/* eslint-disable import/first */
 import dotenv from 'dotenv';
 import { Sequelize } from 'sequelize';
 
 dotenv.config();
-import { createCategoryModel, initialCategories } from '../src/models/category';
+
+import { initCategoryData } from '../src/models/category';
+import { initUserData } from '../src/models/user';
+import { initAuthorData } from '../src/models/author';
 
 const script = async () => {
   console.log('db initial data started');
@@ -18,12 +23,14 @@ const script = async () => {
     return;
   }
   try {
-    const CategoryModel = createCategoryModel(sequelize);
-    // await CategoryModel.drop();
-    await CategoryModel.sync({ force: true });
-    const promises = initialCategories.map(data => CategoryModel.create(data));
-
+    const userTask = async (seq: Sequelize) => {
+      await initUserData(seq);
+      return initAuthorData(seq);
+    };
+    const tasks = [initCategoryData, userTask];
+    const promises: Promise<any>[] = tasks.map(task => task(sequelize));
     const res = await Promise.all(promises);
+
     console.log('script completed', res);
   } catch (error) {
     console.error('create error', error);

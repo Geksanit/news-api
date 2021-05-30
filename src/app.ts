@@ -1,3 +1,4 @@
+/* eslint-disable import/first */
 import dotenv from 'dotenv';
 import express from 'express';
 import bodyParser from 'body-parser';
@@ -10,6 +11,8 @@ import * as OpenApiValidator from 'express-openapi-validator';
 dotenv.config();
 
 import * as categories from './modules/categories';
+import * as users from './modules/users';
+import * as authors from './modules/authors';
 import { log } from './libs/log';
 import { errorHandler } from './middlewares/errorHandler';
 
@@ -41,6 +44,8 @@ app.use(
 );
 
 app.use('/categories', categories.makeRouter(sequelize));
+app.use('/users', users.makeRouter(sequelize));
+app.use('/authors', authors.makeRouter(sequelize));
 
 app.use(errorHandler);
 

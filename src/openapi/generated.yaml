@@ -1,7 +1,7 @@
 openapi: 3.0.1
 info:
-  title: NewSite Rest API
-  description: Categories
+  title: Rest API Docs
+  description: MetaNews is a news site
   version: 1.0.0
 paths:
   /categories/:
@@ -83,7 +83,7 @@ paths:
           description: Invalid request provided
         '500':
           description: Unexpected Error
-    patch:
+    put:
       tags:
         - Category
       summary: Update category
@@ -129,6 +129,384 @@ paths:
           schema:
             type: integer
           description: Category delete request
+      responses:
+        '200':
+          description: Successful operation
+        '400':
+          description: Invalid request provided
+        '500':
+          description: Unexpected Error
+  /users/:
+    get:
+      tags:
+        - Users
+      summary: List all available users
+      responses:
+        '200':
+          description: A list of users.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  allOf:
+                    - type: object
+                      properties:
+                        login:
+                          type: string
+                        passwordHash:
+                          type: string
+                        firstName:
+                          type: string
+                        lastName:
+                          type: string
+                        avatarUrl:
+                          type: string
+                        isAdmin:
+                          type: boolean
+                      required:
+                        - login
+                        - passwordHash
+                        - firstName
+                        - lastName
+                        - avatarUrl
+                        - isAdmin
+                    - type: object
+                      properties:
+                        id:
+                          type: integer
+                      required:
+                        - id
+        '500':
+          description: Unexpected Error
+    post:
+      tags:
+        - Users
+      summary: Add a new user
+      requestBody:
+        description: User create request
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                login:
+                  type: string
+                passwordHash:
+                  type: string
+                firstName:
+                  type: string
+                lastName:
+                  type: string
+                avatarUrl:
+                  type: string
+                isAdmin:
+                  type: boolean
+              required:
+                - login
+                - passwordHash
+                - firstName
+                - lastName
+                - avatarUrl
+                - isAdmin
+        required: true
+      responses:
+        '201':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - type: object
+                    properties:
+                      login:
+                        type: string
+                      passwordHash:
+                        type: string
+                      firstName:
+                        type: string
+                      lastName:
+                        type: string
+                      avatarUrl:
+                        type: string
+                      isAdmin:
+                        type: boolean
+                    required:
+                      - login
+                      - passwordHash
+                      - firstName
+                      - lastName
+                      - avatarUrl
+                      - isAdmin
+                  - type: object
+                    properties:
+                      id:
+                        type: integer
+                    required:
+                      - id
+        '400':
+          description: Invalid request provided
+        '500':
+          description: Unexpected Error
+    put:
+      tags:
+        - Users
+      summary: Update user
+      requestBody:
+        description: User update request
+        content:
+          application/json:
+            schema:
+              allOf:
+                - type: object
+                  properties:
+                    login:
+                      type: string
+                    passwordHash:
+                      type: string
+                    firstName:
+                      type: string
+                    lastName:
+                      type: string
+                    avatarUrl:
+                      type: string
+                    isAdmin:
+                      type: boolean
+                  required:
+                    - login
+                    - passwordHash
+                    - firstName
+                    - lastName
+                    - avatarUrl
+                    - isAdmin
+                - type: object
+                  properties:
+                    id:
+                      type: integer
+                  required:
+                    - id
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+        '400':
+          description: Invalid request provided
+        '500':
+          description: Unexpected Error
+  '/users/{id}':
+    get:
+      tags:
+        - Users
+      summary: Get user
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: get user by id
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - type: object
+                    properties:
+                      login:
+                        type: string
+                      passwordHash:
+                        type: string
+                      firstName:
+                        type: string
+                      lastName:
+                        type: string
+                      avatarUrl:
+                        type: string
+                      isAdmin:
+                        type: boolean
+                    required:
+                      - login
+                      - passwordHash
+                      - firstName
+                      - lastName
+                      - avatarUrl
+                      - isAdmin
+                  - type: object
+                    properties:
+                      id:
+                        type: integer
+                    required:
+                      - id
+        '500':
+          description: Unexpected Error
+    delete:
+      tags:
+        - Users
+      summary: Delete user
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: User delete request
+      responses:
+        '200':
+          description: Successful operation
+        '400':
+          description: Invalid request provided
+        '500':
+          description: Unexpected Error
+  /authors/:
+    get:
+      tags:
+        - Authors
+      summary: List all available authors
+      responses:
+        '200':
+          description: A list of authors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  allOf:
+                    - type: object
+                      properties:
+                        userId:
+                          type: integer
+                        description:
+                          type: string
+                      required:
+                        - userID
+                        - description
+                    - type: object
+                      properties:
+                        id:
+                          type: integer
+                      required:
+                        - id
+        '500':
+          description: Unexpected Error
+    post:
+      tags:
+        - Authors
+      summary: Add a new author
+      requestBody:
+        description: Author create request
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                userId:
+                  type: integer
+                description:
+                  type: string
+              required:
+                - userID
+                - description
+        required: true
+      responses:
+        '201':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - type: object
+                    properties:
+                      userId:
+                        type: integer
+                      description:
+                        type: string
+                    required:
+                      - userID
+                      - description
+                  - type: object
+                    properties:
+                      id:
+                        type: integer
+                    required:
+                      - id
+        '400':
+          description: Invalid request provided
+        '500':
+          description: Unexpected Error
+    put:
+      tags:
+        - Authors
+      summary: Update author
+      requestBody:
+        description: Author update request
+        content:
+          application/json:
+            schema:
+              allOf:
+                - type: object
+                  properties:
+                    userId:
+                      type: integer
+                    description:
+                      type: string
+                  required:
+                    - userID
+                    - description
+                - type: object
+                  properties:
+                    id:
+                      type: integer
+                  required:
+                    - id
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+        '400':
+          description: Invalid request provided
+        '500':
+          description: Unexpected Error
+  '/authors/{id}':
+    get:
+      tags:
+        - Authors
+      summary: Get author
+      responses:
+        '200':
+          description: get author by id
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - type: object
+                    properties:
+                      userId:
+                        type: integer
+                      description:
+                        type: string
+                    required:
+                      - userID
+                      - description
+                  - type: object
+                    properties:
+                      id:
+                        type: integer
+                    required:
+                      - id
+        '500':
+          description: Unexpected Error
+    delete:
+      tags:
+        - Authors
+      summary: Delete author
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: Author delete request
       responses:
         '200':
           description: Successful operation

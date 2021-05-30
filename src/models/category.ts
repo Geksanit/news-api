@@ -75,3 +75,11 @@ export const initialCategories: CreateCategory[] = [
     label: 'Rally sport',
   },
 ];
+
+export const initCategoryData = async (sequelize: Sequelize) => {
+  const CategoryModel = createCategoryModel(sequelize);
+  // await CategoryModel.drop();
+  await CategoryModel.sync({ force: true });
+  const promises = initialCategories.map(data => CategoryModel.create(data));
+  return Promise.all(promises);
+};
