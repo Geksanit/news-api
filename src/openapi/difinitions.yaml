@@ -31,19 +31,14 @@ components:
         default: 20
   schemas:
     Category:
-      type: object
-      properties:
-        id: 
-          type: integer
-        parentCategoryId:
-          nullable: true
-          type: integer
-        label: 
-          type: string
-      required:
-        - id
-        - label
-        - parentCategoryId
+      allOf:
+        - $ref: '#/components/schemas/CreateCategory'
+        - type: object
+          properties:
+            id: 
+              type: integer
+          required:
+            - id
 
     CreateCategory:
       type: object
@@ -56,3 +51,59 @@ components:
       required:
         - label
         - parentCategoryId
+
+    User:
+      allOf:
+        - $ref: '#/components/schemas/CreateUser'
+        - type: object
+          properties:
+            id: 
+              type: integer
+          required:
+            - id
+
+    CreateUser:
+      type: object
+      properties:
+        login:
+          type: string
+        passwordHash:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        avatarUrl:
+          type: string
+        isAdmin:
+          type: boolean
+      required:
+        - login
+        - passwordHash
+        - firstName
+        - lastName
+        - avatarUrl
+        - isAdmin
+
+    Author:
+      allOf:
+        - $ref: '#/components/schemas/CreateAuthor'
+        - type: object
+          properties:
+            id: 
+              type: integer
+          required:
+            - id
+
+
+    CreateAuthor:
+      type: object
+      properties:
+        userId:
+          type: integer
+        description:
+          type: string
+      required:
+        - userID
+        - description
+        

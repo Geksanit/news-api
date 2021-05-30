@@ -1,0 +1,83 @@
+openapi: 3.0.1
+info:
+  title: NewSite Rest API
+  description: Categories
+  version: 1.0.0
+paths:
+  /categories/:
+    get:
+      tags:
+        - Category
+      summary: All available categories
+      responses:
+        200:
+          description: A list of categories.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "difinitions.yaml#/components/schemas/Category"
+        500:
+          description: Unexpected Error
+    post:
+      tags:
+        - Category
+      summary: Add a new category
+      requestBody:
+        description: Category create request
+        content:
+          application/json:
+            schema:
+              $ref: "difinitions.yaml#/components/schemas/CreateCategory"
+        required: true
+      responses:
+        201:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "difinitions.yaml#/components/schemas/Category"
+        400:
+          description: Invalid request provided
+        500:
+          description: Unexpected Error
+
+    patch:
+      tags:
+        - Category
+      summary: Update category
+      requestBody:
+        description: Category update request
+        content:
+          application/json:
+            schema:
+              $ref: "difinitions.yaml#/components/schemas/Category"
+        required: true
+      responses:
+        200:
+          description: Successful operation
+        400:
+          description: Invalid request provided
+        500:
+          description: Unexpected Error
+
+  /categories/{id}:
+    delete:
+      tags:
+        - Category
+      summary: Delete category
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: 
+            type: integer
+          description: Category delete request
+      responses:
+        200:
+          description: Successful operation
+        400:
+          description: Invalid request provided
+        500:
+          description: Unexpected Error
