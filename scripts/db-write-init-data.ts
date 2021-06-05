@@ -24,14 +24,14 @@ const script = async () => {
   }
   try {
     const userTask = async (seq: Sequelize) => {
-      await initUserData(seq);
-      return initAuthorData(seq);
+      await initUserData(seq, true);
+      await initAuthorData(seq);
     };
     const tasks = [initCategoryData, userTask];
     const promises: Promise<any>[] = tasks.map(task => task(sequelize));
-    const res = await Promise.all(promises);
+    await Promise.all(promises);
 
-    console.log('script completed', res);
+    console.log('script completed');
   } catch (error) {
     console.error('create error', error);
   }

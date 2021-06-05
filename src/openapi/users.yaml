@@ -8,7 +8,9 @@ paths:
     get:
       tags:
         - Users
-      summary: List all available users
+      summary: List all users (available only for admins)
+      security:
+        - cookieAuth: []
       responses:
         200:
           description: A list of users.
@@ -17,7 +19,9 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "difinitions.yaml#/components/schemas/User"
+                  $ref: "difinitions.yaml#/components/schemas/UserView"
+        401:
+          description: Not authorized
         500:
           description: Unexpected Error
     post:
@@ -37,21 +41,23 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "difinitions.yaml#/components/schemas/User"
+                $ref: "difinitions.yaml#/components/schemas/UserView"
         400:
           description: Invalid request provided
         500:
           description: Unexpected Error
-    put:
+    patch:
       tags:
         - Users
-      summary: Update user
+      summary: Update user (available only for admins)
+      security:
+        - cookieAuth: []
       requestBody:
         description: User update request
         content:
           application/json:
             schema:
-              $ref: "difinitions.yaml#/components/schemas/User"
+              $ref: "difinitions.yaml#/components/schemas/UserView"
         required: true
       responses:
         200:
@@ -62,29 +68,12 @@ paths:
           description: Unexpected Error
 
   /users/{id}:
-    get:
-      tags:
-        - Users
-      summary: Get user
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema: 
-            type: integer
-      responses:
-        200:
-          description: get user by id
-          content:
-            application/json:
-              schema:
-                $ref: "difinitions.yaml#/components/schemas/User"
-        500:
-          description: Unexpected Error
     delete:
       tags:
         - Users
-      summary: Delete user
+      summary: Delete user (available only for admins)
+      security:
+        - cookieAuth: []
       parameters:
         - in: path
           name: id
@@ -95,6 +84,49 @@ paths:
       responses:
         200:
           description: Successful operation
+        400:
+          description: Invalid request provided
+        500:
+          description: Unexpected Error
+  /users/me:
+    get:
+      tags:
+        - Users
+      summary: Get my user
+      security:
+        - cookieAuth: []
+      responses:
+        200:
+          description: get user
+          content:
+            application/json:
+              schema:
+                $ref: "difinitions.yaml#/components/schemas/UserView"
+        500:
+          description: Unexpected Error
+  /users/login/:
+    post:
+      tags:
+        - Users
+      summary: authoriztion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "difinitions.yaml#/components/schemas/Login"
+        required: true
+      responses:
+        200:
+          description: Authorized
+          headers: 
+            Set-Cookie:
+              schema: 
+                type: string
+                example: JWT=abcde12345; Path=/; HttpOnly
+          content:
+            application/json:
+              schema:
+                $ref: "difinitions.yaml#/components/schemas/UserView"
         400:
           description: Invalid request provided
         500:

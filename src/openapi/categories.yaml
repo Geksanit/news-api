@@ -24,8 +24,10 @@ paths:
       tags:
         - Category
       summary: Add a new category
+      security:
+        - cookieAuth: []
       requestBody:
-        description: Category create request
+        description: Category create request (available only for admins)
         content:
           application/json:
             schema:
@@ -46,8 +48,10 @@ paths:
       tags:
         - Category
       summary: Update category
+      security:
+        - cookieAuth: []
       requestBody:
-        description: Category update request
+        description: Category update request (available only for admins)
         content:
           application/json:
             schema:
@@ -63,9 +67,11 @@ paths:
 
   /categories/{id}:
     delete:
+      security:
+        - cookieAuth: []
       tags:
         - Category
-      summary: Delete category
+      summary: Delete category (available only for admins)
       parameters:
         - in: path
           name: id

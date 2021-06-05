@@ -2,6 +2,7 @@
 import dotenv from 'dotenv';
 import express from 'express';
 import bodyParser from 'body-parser';
+import cookieParser from 'cookie-parser';
 import { Sequelize } from 'sequelize';
 import swaggerUi from 'swagger-ui-express';
 import yaml from 'yamljs';
@@ -15,6 +16,7 @@ import * as users from './modules/users';
 import * as authors from './modules/authors';
 import { log } from './libs/log';
 import { errorHandler } from './middlewares/errorHandler';
+import { initializeAuth } from './auth';
 
 const apiSpec = path.resolve(__dirname, './openapi/generated.yaml');
 const swaggerDocument = yaml.load(apiSpec);
@@ -28,6 +30,7 @@ const port = 3000;
 const app = express();
 
 app.use(bodyParser.json());
+app.use(cookieParser());
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.get('/', (req, res) => {
   log.info('request', req.method, req.url);
@@ -35,6 +38,7 @@ app.get('/', (req, res) => {
   res.setHeader('Content-Type', 'text/plain');
   res.end('Hello World');
 });
+
 app.use(
   OpenApiValidator.middleware({
     apiSpec,
@@ -42,6 +46,8 @@ app.use(
     // validateResponses: false,
   }),
 );
+
+initializeAuth(app, sequelize);
 
 app.use('/categories', categories.makeRouter(sequelize));
 app.use('/users', users.makeRouter(sequelize));

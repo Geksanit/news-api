@@ -40,8 +40,10 @@ paths:
       tags:
         - Category
       summary: Add a new category
+      security:
+        - cookieAuth: []
       requestBody:
-        description: Category create request
+        description: Category create request (available only for admins)
         content:
           application/json:
             schema:
@@ -87,8 +89,10 @@ paths:
       tags:
         - Category
       summary: Update category
+      security:
+        - cookieAuth: []
       requestBody:
-        description: Category update request
+        description: Category update request (available only for admins)
         content:
           application/json:
             schema:
@@ -119,9 +123,11 @@ paths:
           description: Unexpected Error
   '/categories/{id}':
     delete:
+      security:
+        - cookieAuth: []
       tags:
         - Category
-      summary: Delete category
+      summary: Delete category (available only for admins)
       parameters:
         - in: path
           name: id
@@ -140,7 +146,9 @@ paths:
     get:
       tags:
         - Users
-      summary: List all available users
+      summary: List all users (available only for admins)
+      security:
+        - cookieAuth: []
       responses:
         '200':
           description: A list of users.
@@ -152,9 +160,7 @@ paths:
                   allOf:
                     - type: object
                       properties:
-                        login:
-                          type: string
-                        passwordHash:
+                        username:
                           type: string
                         firstName:
                           type: string
@@ -162,21 +168,22 @@ paths:
                           type: string
                         avatarUrl:
                           type: string
-                        isAdmin:
-                          type: boolean
                       required:
-                        - login
-                        - passwordHash
+                        - username
                         - firstName
                         - lastName
                         - avatarUrl
-                        - isAdmin
                     - type: object
                       properties:
                         id:
                           type: integer
+                        isAdmin:
+                          type: boolean
                       required:
                         - id
+                        - isAdmin
+        '401':
+          description: Not authorized
         '500':
           description: Unexpected Error
     post:
@@ -188,27 +195,28 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                login:
-                  type: string
-                passwordHash:
-                  type: string
-                firstName:
-                  type: string
-                lastName:
-                  type: string
-                avatarUrl:
-                  type: string
-                isAdmin:
-                  type: boolean
-              required:
-                - login
-                - passwordHash
-                - firstName
-                - lastName
-                - avatarUrl
-                - isAdmin
+              allOf:
+                - type: object
+                  properties:
+                    username:
+                      type: string
+                    firstName:
+                      type: string
+                    lastName:
+                      type: string
+                    avatarUrl:
+                      type: string
+                  required:
+                    - username
+                    - firstName
+                    - lastName
+                    - avatarUrl
+                - type: object
+                  properties:
+                    password:
+                      type: string
+                  required:
+                    - password
         required: true
       responses:
         '201':
@@ -219,9 +227,7 @@ paths:
                 allOf:
                   - type: object
                     properties:
-                      login:
-                        type: string
-                      passwordHash:
+                      username:
                         type: string
                       firstName:
                         type: string
@@ -229,29 +235,30 @@ paths:
                         type: string
                       avatarUrl:
                         type: string
-                      isAdmin:
-                        type: boolean
                     required:
-                      - login
-                      - passwordHash
+                      - username
                       - firstName
                       - lastName
                       - avatarUrl
-                      - isAdmin
                   - type: object
                     properties:
                       id:
                         type: integer
+                      isAdmin:
+                        type: boolean
                     required:
                       - id
+                      - isAdmin
         '400':
           description: Invalid request provided
         '500':
           description: Unexpected Error
-    put:
+    patch:
       tags:
         - Users
-      summary: Update user
+      summary: Update user (available only for admins)
+      security:
+        - cookieAuth: []
       requestBody:
         description: User update request
         content:
@@ -260,9 +267,7 @@ paths:
               allOf:
                 - type: object
                   properties:
-                    login:
-                      type: string
-                    passwordHash:
+                    username:
                       type: string
                     firstName:
                       type: string
@@ -270,21 +275,20 @@ paths:
                       type: string
                     avatarUrl:
                       type: string
-                    isAdmin:
-                      type: boolean
                   required:
-                    - login
-                    - passwordHash
+                    - username
                     - firstName
                     - lastName
                     - avatarUrl
-                    - isAdmin
                 - type: object
                   properties:
                     id:
                       type: integer
+                    isAdmin:
+                      type: boolean
                   required:
                     - id
+                    - isAdmin
         required: true
       responses:
         '200':
@@ -294,56 +298,12 @@ paths:
         '500':
           description: Unexpected Error
   '/users/{id}':
-    get:
-      tags:
-        - Users
-      summary: Get user
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: integer
-      responses:
-        '200':
-          description: get user by id
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - type: object
-                    properties:
-                      login:
-                        type: string
-                      passwordHash:
-                        type: string
-                      firstName:
-                        type: string
-                      lastName:
-                        type: string
-                      avatarUrl:
-                        type: string
-                      isAdmin:
-                        type: boolean
-                    required:
-                      - login
-                      - passwordHash
-                      - firstName
-                      - lastName
-                      - avatarUrl
-                      - isAdmin
-                  - type: object
-                    properties:
-                      id:
-                        type: integer
-                    required:
-                      - id
-        '500':
-          description: Unexpected Error
     delete:
       tags:
         - Users
-      summary: Delete user
+      summary: Delete user (available only for admins)
+      security:
+        - cookieAuth: []
       parameters:
         - in: path
           name: id
@@ -358,11 +318,114 @@ paths:
           description: Invalid request provided
         '500':
           description: Unexpected Error
+  /users/me:
+    get:
+      tags:
+        - Users
+      summary: Get my user
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: get user
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - type: object
+                    properties:
+                      username:
+                        type: string
+                      firstName:
+                        type: string
+                      lastName:
+                        type: string
+                      avatarUrl:
+                        type: string
+                    required:
+                      - username
+                      - firstName
+                      - lastName
+                      - avatarUrl
+                  - type: object
+                    properties:
+                      id:
+                        type: integer
+                      isAdmin:
+                        type: boolean
+                    required:
+                      - id
+                      - isAdmin
+        '500':
+          description: Unexpected Error
+  /users/login/:
+    post:
+      tags:
+        - Users
+      summary: authoriztion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  example: userLogin
+                password:
+                  type: string
+                  example: 123
+              required:
+                - username
+                - password
+        required: true
+      responses:
+        '200':
+          description: Authorized
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+                example: JWT=abcde12345; Path=/; HttpOnly
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - type: object
+                    properties:
+                      username:
+                        type: string
+                      firstName:
+                        type: string
+                      lastName:
+                        type: string
+                      avatarUrl:
+                        type: string
+                    required:
+                      - username
+                      - firstName
+                      - lastName
+                      - avatarUrl
+                  - type: object
+                    properties:
+                      id:
+                        type: integer
+                      isAdmin:
+                        type: boolean
+                    required:
+                      - id
+                      - isAdmin
+        '400':
+          description: Invalid request provided
+        '500':
+          description: Unexpected Error
   /authors/:
     get:
       tags:
         - Authors
-      summary: List all available authors
+      summary: List all available authors (available only for admins)
+      security:
+        - cookieAuth: []
       responses:
         '200':
           description: A list of authors.
@@ -379,7 +442,7 @@ paths:
                         description:
                           type: string
                       required:
-                        - userID
+                        - userId
                         - description
                     - type: object
                       properties:
@@ -392,7 +455,9 @@ paths:
     post:
       tags:
         - Authors
-      summary: Add a new author
+      summary: Add a new author (available only for admins)
+      security:
+        - cookieAuth: []
       requestBody:
         description: Author create request
         content:
@@ -405,7 +470,7 @@ paths:
                 description:
                   type: string
               required:
-                - userID
+                - userId
                 - description
         required: true
       responses:
@@ -422,7 +487,7 @@ paths:
                       description:
                         type: string
                     required:
-                      - userID
+                      - userId
                       - description
                   - type: object
                     properties:
@@ -437,7 +502,9 @@ paths:
     put:
       tags:
         - Authors
-      summary: Update author
+      summary: Update author (available only for admins)
+      security:
+        - cookieAuth: []
       requestBody:
         description: Author update request
         content:
@@ -451,7 +518,7 @@ paths:
                     description:
                       type: string
                   required:
-                    - userID
+                    - userId
                     - description
                 - type: object
                   properties:
@@ -471,7 +538,15 @@ paths:
     get:
       tags:
         - Authors
-      summary: Get author
+      summary: Get author (available only for admins)
+      security:
+        - cookieAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
       responses:
         '200':
           description: get author by id
@@ -486,7 +561,7 @@ paths:
                       description:
                         type: string
                     required:
-                      - userID
+                      - userId
                       - description
                   - type: object
                     properties:
@@ -499,7 +574,9 @@ paths:
     delete:
       tags:
         - Authors
-      summary: Delete author
+      summary: Delete author (available only for admins)
+      security:
+        - cookieAuth: []
       parameters:
         - in: path
           name: id
@@ -514,3 +591,9 @@ paths:
           description: Invalid request provided
         '500':
           description: Unexpected Error
+components:
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: jwt

@@ -10,7 +10,7 @@ import { createUserModel } from '../src/models/user';
 import { createAuthorModel } from '../src/models/author';
 
 const script = async () => {
-  console.log('db init models script started');
+  console.log('db sync models script started');
   const sequelize = new Sequelize(process.env.DB_NAME, 'postgres', process.env.DB_PASS, {
     host: 'localhost',
     dialect: 'postgres',

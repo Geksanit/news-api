@@ -52,22 +52,65 @@ components:
         - label
         - parentCategoryId
 
-    User:
-      allOf:
-        - $ref: '#/components/schemas/CreateUser'
-        - type: object
-          properties:
-            id: 
-              type: integer
-          required:
-            - id
-
-    CreateUser:
+    Login:
       type: object
       properties:
-        login:
+        username:
           type: string
-        passwordHash:
+          example: userLogin    
+        password:
+          type: string
+          example: 123    
+      required:
+        - username
+        - password
+        
+    UserModel:
+      allOf:
+        - $ref: '#/components/schemas/BaseUser'
+        - type: object
+          properties:
+            passwordHash: 
+              type: string
+            id:
+              type: integer
+            tokenCounter:
+              type: integer
+            isAdmin:
+              type: boolean
+          required:
+            - passwordHash
+            - id
+            - tokenCounter
+            - isAdmin
+    UserView:
+      allOf:
+        - $ref: '#/components/schemas/BaseUser'
+        - type: object
+          properties:
+            id:
+              type: integer
+            isAdmin:
+              type: boolean
+          required:
+            - id
+            - isAdmin
+
+    CreateUser:
+      allOf:
+        - $ref: '#/components/schemas/BaseUser'
+        - type: object
+          properties:
+            password: 
+              type: string
+          required:
+            - password
+
+
+    BaseUser:
+      type: object
+      properties:
+        username:
           type: string
         firstName:
           type: string
@@ -75,15 +118,11 @@ components:
           type: string
         avatarUrl:
           type: string
-        isAdmin:
-          type: boolean
       required:
-        - login
-        - passwordHash
+        - username
         - firstName
         - lastName
         - avatarUrl
-        - isAdmin
 
     Author:
       allOf:

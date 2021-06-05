@@ -12,7 +12,18 @@ paths:
     $ref: 'users.yaml#/paths/~1users~1'
   /users/{id}:
     $ref: 'users.yaml#/paths/~1users~1{id}'
+  /users/me:
+    $ref: 'users.yaml#/paths/~1users~1me'
+  /users/login/:
+    $ref: 'users.yaml#/paths/~1users~1login~1'
   /authors/:
     $ref: 'authors.yaml#/paths/~1authors~1'
   /authors/{id}:
     $ref: 'authors.yaml#/paths/~1authors~1{id}'
+
+components:
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: jwt

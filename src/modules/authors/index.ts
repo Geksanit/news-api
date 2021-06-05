@@ -4,14 +4,14 @@ import { Sequelize } from 'sequelize/types';
 import { HttpError } from '../../utils/Errors';
 import { createLogger } from '../../middlewares/logger';
 import { createAuthorModel, getAuthorFromInstance, attributes } from '../../models/author';
+import { authenticateAdmin } from '../../middlewares/authenticate';
 
 export const makeRouter = (sequelize: Sequelize) => {
   const AuthorModel = createAuthorModel(sequelize);
   const router = express.Router();
-
   router.use(createLogger(module));
 
-  router.get('/', async (req, res, next) => {
+  router.get('/', authenticateAdmin, async (req, res, next) => {
     try {
       const authors = await AuthorModel.findAll({ attributes });
       res.json(authors);
@@ -19,7 +19,7 @@ export const makeRouter = (sequelize: Sequelize) => {
       next(error);
     }
   });
-  router.post('/', async (req, res, next) => {
+  router.post('/', authenticateAdmin, async (req, res, next) => {
     try {
       const instance = await AuthorModel.create(req.body);
       res.status(201).send(getAuthorFromInstance(instance));
@@ -27,7 +27,7 @@ export const makeRouter = (sequelize: Sequelize) => {
       next(error);
     }
   });
-  router.patch('/', async (req, res, next) => {
+  router.patch('/', authenticateAdmin, async (req, res, next) => {
     try {
       await AuthorModel.update(req.body, { where: { id: req.body.id } });
       res.send('updated');
@@ -35,7 +35,7 @@ export const makeRouter = (sequelize: Sequelize) => {
       next(error);
     }
   });
-  router.get('/:id', async (req, res, next) => {
+  router.get('/:id', authenticateAdmin, async (req, res, next) => {
     try {
       const {
         params: { id },
@@ -48,7 +48,7 @@ export const makeRouter = (sequelize: Sequelize) => {
       next(error);
     }
   });
-  router.delete('/:id', async (req, res, next) => {
+  router.delete('/:id', authenticateAdmin, async (req, res, next) => {
     try {
       const {
         params: { id },

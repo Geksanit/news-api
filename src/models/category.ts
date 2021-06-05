@@ -80,6 +80,8 @@ export const initCategoryData = async (sequelize: Sequelize) => {
   const CategoryModel = createCategoryModel(sequelize);
   // await CategoryModel.drop();
   await CategoryModel.sync({ force: true });
-  const promises = initialCategories.map(data => CategoryModel.create(data));
+  const promises = initialCategories.map(async data => {
+    await CategoryModel.create(data);
+  });
   return Promise.all(promises);
 };

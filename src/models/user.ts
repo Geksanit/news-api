@@ -1,10 +1,12 @@
 import { Sequelize, Model, DataTypes, Optional } from 'sequelize';
-import { User, CreateUser } from 'src/types/generated';
+import { UserModel, UserView, CreateUser } from 'src/types/generated';
 import * as R from 'ramda';
 
-interface UserCreationAttributes extends Optional<User, 'id'> {}
+import { getHash } from '../libs/passwordHash';
 
-interface UserInstance extends Model<User, UserCreationAttributes>, User {}
+interface UserCreationAttributes extends Optional<UserModel, 'id'> {}
+
+interface UserInstance extends Model<UserModel, UserCreationAttributes>, UserModel {}
 
 export const createUserModel = (sequalize: Sequelize) =>
   sequalize.define<UserInstance>('User', {
@@ -13,7 +15,7 @@ export const createUserModel = (sequalize: Sequelize) =>
       autoIncrement: true,
       primaryKey: true,
     },
-    login: {
+    username: {
       type: DataTypes.STRING,
     },
     firstName: {
@@ -31,53 +33,73 @@ export const createUserModel = (sequalize: Sequelize) =>
     isAdmin: {
       type: DataTypes.BOOLEAN,
     },
+    tokenCounter: {
+      type: DataTypes.INTEGER,
+    },
   });
-export const attributes: Array<keyof User> = [
+export const userViewAttributes: Array<keyof UserView> = [
   'id',
-  'login',
+  'username',
   'firstName',
   'lastName',
-  // 'passwordHash',
   'avatarUrl',
   'isAdmin',
 ];
 /**
  * User omit virtual attributes
  */
-export const getUserFromInstance = (instance: UserInstance): User =>
-  R.pick<keyof User>(attributes)(instance);
+export const getUserViewFromInstance = (instance: UserInstance): UserView =>
+  R.pick<keyof UserView>(userViewAttributes)(instance);
 
-export const initialCategories: CreateUser[] = [
+export const createUserToModel = async ({
+  password,
+  ...rest
+}: CreateUser): Promise<Omit<UserModel, 'id'>> => {
+  const passwordHash = await getHash(password);
+  return {
+    ...rest,
+    passwordHash,
+    isAdmin: false,
+    tokenCounter: 0,
+  };
+};
+
+export const initialCategories: Array<CreateUser & { isAdmin: boolean }> = [
   {
-    login: 'userLogin',
+    username: 'userLogin',
     firstName: 'Joe',
     lastName: 'Nep',
-    passwordHash: '123',
+    password: '123',
     avatarUrl: '123',
     isAdmin: false,
   },
   {
-    login: 'darkL0rd',
+    username: 'darkL0rd',
     firstName: 'Tolik',
     lastName: 'Tipupkin',
-    passwordHash: '123',
+    password: '123',
     avatarUrl: '123',
     isAdmin: true,
   },
   {
-    login: 'aaa111',
+    username: 'aaa111',
     firstName: 'Dmitriy',
     lastName: 'Morozov',
-    passwordHash: 'qwerty12345',
+    password: 'qwerty12345',
     avatarUrl: '',
     isAdmin: false,
   },
 ];
 
-export const initUserData = async (sequelize: Sequelize) => {
+export const initUserData = async (sequelize: Sequelize, isDropTable: boolean) => {
   const model = createUserModel(sequelize);
-  // await UserModel.drop();
+  if (isDropTable) {
+    await model.drop();
+  }
   await model.sync({ force: true });
-  const promises = initialCategories.map(data => model.create(data));
+  const promises = initialCategories.map(async data => {
+    const userModel = await createUserToModel(data);
+    await model.create({ ...userModel, isAdmin: data.isAdmin });
+  });
   return Promise.all(promises);
 };

@@ -43,6 +43,8 @@ export const initAuthorData = async (sequelize: Sequelize) => {
   const model = createAuthorModel(sequelize);
   // await AuthorModel.drop();
   await model.sync({ force: true });
-  const promises = initialCategories.map(data => model.create(data));
+  const promises = initialCategories.map(async data => {
+    await model.create(data);
+  });
   return Promise.all(promises);
 };

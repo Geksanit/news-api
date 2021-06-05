@@ -4,11 +4,11 @@ import { Sequelize } from 'sequelize/types';
 import { HttpError } from '../../utils/Errors';
 import { createLogger } from '../../middlewares/logger';
 import { createCategoryModel, getCategoryFromInstance } from '../../models/category';
+import { authenticateAdmin } from '../../middlewares/authenticate';
 
 export const makeRouter = (sequelize: Sequelize) => {
   const CategoryModel = createCategoryModel(sequelize);
   const router = express.Router();
-
   router.use(createLogger(module));
 
   router.get('/', async (req, res, next) => {
@@ -21,7 +21,7 @@ export const makeRouter = (sequelize: Sequelize) => {
       next(error);
     }
   });
-  router.post('/', async (req, res, next) => {
+  router.post('/', authenticateAdmin, async (req, res, next) => {
     try {
       const parentCategory = await CategoryModel.findOne({
         where: { id: req.body.parentCategoryId },
@@ -35,7 +35,7 @@ export const makeRouter = (sequelize: Sequelize) => {
       next(error);
     }
   });
-  router.patch('/', async (req, res, next) => {
+  router.patch('/', authenticateAdmin, async (req, res, next) => {
     try {
       await CategoryModel.update(req.body, { where: { id: req.body.id } });
       res.send('updated');
@@ -43,7 +43,7 @@ export const makeRouter = (sequelize: Sequelize) => {
       next(error);
     }
   });
-  router.delete('/:id', async (req, res, next) => {
+  router.delete('/:id', authenticateAdmin, async (req, res, next) => {
     try {
       const {
         params: { id },
