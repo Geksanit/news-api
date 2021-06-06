@@ -4,10 +4,6 @@ info:
   description: MetaNews is a news site
   version: 1.0.0
 paths:
-  /categories/:
-    $ref: 'categories.yaml#/paths/~1categories~1'
-  /categories/{id}:
-    $ref: 'categories.yaml#/paths/~1categories~1{id}'
   /users/:
     $ref: 'users.yaml#/paths/~1users~1'
   /users/{id}:
@@ -20,6 +16,22 @@ paths:
     $ref: 'authors.yaml#/paths/~1authors~1'
   /authors/{id}:
     $ref: 'authors.yaml#/paths/~1authors~1{id}'
+  /posts/:
+    $ref: 'news.yaml#/paths/~1posts~1'
+  /posts/{id}:
+    $ref: 'news.yaml#/paths/~1posts~1{id}'
+  /comments/:
+    $ref: 'comments.yaml#/paths/~1comments~1'
+  /comments/{id}:
+    $ref: 'comments.yaml#/paths/~1comments~1{id}'
+  /categories/:
+    $ref: 'categories.yaml#/paths/~1categories~1'
+  /categories/{id}:
+    $ref: 'categories.yaml#/paths/~1categories~1{id}'
+  /tags/:
+    $ref: 'tags.yaml#/paths/~1tags~1'
+  /tags/{id}:
+    $ref: 'tags.yaml#/paths/~1tags~1{id}'
 
 components:
   securitySchemes:

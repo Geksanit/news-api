@@ -39,7 +39,6 @@ components:
               type: integer
           required:
             - id
-
     CreateCategory:
       type: object
       properties:
@@ -95,7 +94,6 @@ components:
           required:
             - id
             - isAdmin
-
     CreateUser:
       allOf:
         - $ref: '#/components/schemas/BaseUser'
@@ -105,8 +103,6 @@ components:
               type: string
           required:
             - password
-
-
     BaseUser:
       type: object
       properties:
@@ -133,7 +129,10 @@ components:
               type: integer
           required:
             - id
-
+    FullAuthor:
+      allOf:
+        - $ref: '#/components/schemas/Author'
+        - $ref: '#/components/schemas/UserView'
 
     CreateAuthor:
       type: object
@@ -145,4 +144,148 @@ components:
       required:
         - userId
         - description
+
+    Tag:
+      allOf:
+        - $ref: '#/components/schemas/CreateTag'
+        - type: object
+          properties:
+            id: 
+              type: integer
+          required:
+            - id
+    CreateTag:
+      type: object
+      properties:
+        label: 
+          type: string
+      required:
+        - label
+
+    News:
+      allOf:
+        - $ref: '#/components/schemas/CreateNews'
+        - type: object
+          properties:
+            id: 
+              type: integer
+            createdAt:
+              type: string
+              format: date
+              description: Creation date
+              example: "2021-01-30"
+            authorId:
+              type: number
+          required:
+            - id
+            - createdAt
+            - authorId
+    CreateNews:
+      type: object
+      properties:
+        title:
+          type: string
+        categoryId:
+          type: number
+        tagsIds:
+          type: array
+          uniqueItems: true
+          minItems: 1
+          maxItems: 10
+          items:
+            type: number
+        content:
+          type: string
+        topPhotoLink:
+          type: string
+        photoLinks:
+          type: array
+          uniqueItems: true
+          minItems: 0
+          maxItems: 10
+          items: 
+            type: string
+        isDraft:
+          type: boolean
+      required:
+        - title
+        - categoryId
+        - tagsIds
+        - content
+        - topPhotoLink
+        - photoLinks
+        - isDraft
+    FullNews:
+      type: object
+      properties:
+        title:
+          type: string
+        createdAt:
+          type: string
+          format: date
+          description: Creation date
+          example: "2021-01-30"
+        author:
+          $ref: "difinitions.yaml#/components/schemas/FullAuthor"
+        category:
+          $ref: "difinitions.yaml#/components/schemas/Category"
+        tags:
+          type: array
+          uniqueItems: true
+          minItems: 1
+          maxItems: 10
+          items:
+            $ref: "difinitions.yaml#/components/schemas/Tag"
+        content:
+          type: string
+        topPhotoLink:
+          type: string
+        photoLinks:
+          type: array
+          uniqueItems: true
+          minItems: 0
+          maxItems: 10
+          items: 
+            type: string
+        isDraft:
+          type: boolean
+      required:
+        - title
+        - createdAt
+        - author
+        - category
+        - tags
+        - content
+        - topPhotoLink
+        - photoLinks
+        - isDraft
+
+    Comment:
+      allOf:
+        - $ref: '#/components/schemas/CreateComment'
+        - type: object
+          properties:
+            id: 
+              type: integer
+            userId:
+              type: number
+            createdAt:
+              type: string
+              format: date
+              description: Creation date
+              example: "2021-01-30"
+          required:
+            - id
+            - userId
+            - createdAt
+    CreateComment:
+      type: object
+      properties:
+        newsId:
+          type: number
+        content: 
+          type: string
+      required:
+        - newsId
+        - content
         

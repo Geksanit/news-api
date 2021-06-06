@@ -1,37 +1,37 @@
 openapi: 3.0.1
 info:
   title: NewSite Rest API
-  description: Categories
+  description: News
   version: 1.0.0
 paths:
-  /categories/:
+  /posts/:
     get:
       tags:
-        - Category
-      summary: All available categories
+        - News
+      summary: All available news
       responses:
         200:
-          description: A list of categories.
+          description: A list of news.
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: "difinitions.yaml#/components/schemas/Category"
+                  $ref: "difinitions.yaml#/components/schemas/FullNews"
         500:
           description: Unexpected Error
     post:
       tags:
-        - Category
-      summary: Add a new category (available only for admins)
+        - News
+      summary: Add a new News
       security:
         - cookieAuth: []
       requestBody:
-        description: Category create request
+        description: News create request
         content:
           application/json:
             schema:
-              $ref: "difinitions.yaml#/components/schemas/CreateCategory"
+              $ref: "difinitions.yaml#/components/schemas/CreateNews"
         required: true
       responses:
         201:
@@ -39,23 +39,23 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "difinitions.yaml#/components/schemas/Category"
+                $ref: "difinitions.yaml#/components/schemas/News"
         400:
           description: Invalid request provided
         500:
           description: Unexpected Error
     patch:
       tags:
-        - Category
-      summary: Update category (available only for admins)
+        - News
+      summary: Update News
       security:
         - cookieAuth: []
       requestBody:
-        description: Category update request
+        description: News update request
         content:
           application/json:
             schema:
-              $ref: "difinitions.yaml#/components/schemas/Category"
+              $ref: "difinitions.yaml#/components/schemas/News"
         required: true
       responses:
         200:
@@ -65,20 +65,32 @@ paths:
         500:
           description: Unexpected Error
 
-  /categories/{id}:
+  /posts/{id}:
+    get:
+      tags:
+        - News
+      responses:
+        200:
+          description: One post.
+          content:
+            application/json:
+              schema:
+               $ref: "difinitions.yaml#/components/schemas/FullNews"
+        500:
+          description: Unexpected Error
     delete:
       security:
         - cookieAuth: []
       tags:
-        - Category
-      summary: Delete category (available only for admins)
+        - News
+      summary: Delete News (available only for admins)
       parameters:
         - in: path
           name: id
           required: true
           schema: 
             type: integer
-          description: Category delete request
+          description: News delete request
       responses:
         200:
           description: Successful operation

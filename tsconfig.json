@@ -9,6 +9,5 @@
         "sourceMap": false,
         "outDir": "dist",
         "baseUrl": ".",
-        "typeRoots": ["./src/types"]
     },
   }

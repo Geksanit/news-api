@@ -4,34 +4,23 @@ import { Category, CreateCategory } from 'src/types/generated';
 interface CategoryInstance extends Model<Category, CreateCategory>, Category {}
 
 export const createCategoryModel = (sequalize: Sequelize) =>
-  sequalize.define<CategoryInstance>(
-    'Category',
-    {
-      id: {
-        type: DataTypes.INTEGER,
-        autoIncrement: true,
-        primaryKey: true,
-      },
-      parentCategoryId: {
-        type: DataTypes.INTEGER,
-        defaultValue: null,
-        allowNull: true,
-      },
-      label: {
-        type: DataTypes.STRING,
-        unique: true,
-        allowNull: false,
-      },
+  sequalize.define<CategoryInstance>('Category', {
+    id: {
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
+      primaryKey: true,
     },
-    {
-      getterMethods: {
-        getData(this: CategoryInstance) {
-          const { label, id, parentCategoryId } = this;
-          return { label, id, parentCategoryId };
-        },
-      },
+    parentCategoryId: {
+      type: DataTypes.INTEGER,
+      defaultValue: null,
+      allowNull: true,
     },
-  );
+    label: {
+      type: DataTypes.STRING,
+      unique: true,
+      allowNull: false,
+    },
+  });
 /**
  * Category omit virtual attributes
  */

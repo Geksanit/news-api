@@ -1,37 +1,37 @@
 openapi: 3.0.1
 info:
   title: NewSite Rest API
-  description: Categories
+  description: Tags
   version: 1.0.0
 paths:
-  /categories/:
+  /tags/:
     get:
       tags:
-        - Category
-      summary: All available categories
+        - Tags
+      summary: All available tags
       responses:
         200:
-          description: A list of categories.
+          description: A list of tags.
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: "difinitions.yaml#/components/schemas/Category"
+                  $ref: "difinitions.yaml#/components/schemas/Tag"
         500:
           description: Unexpected Error
     post:
       tags:
-        - Category
-      summary: Add a new category (available only for admins)
+        - Tags
+      summary: Add a new Tag (available only for admins)
       security:
         - cookieAuth: []
       requestBody:
-        description: Category create request
+        description: Tag create request
         content:
           application/json:
             schema:
-              $ref: "difinitions.yaml#/components/schemas/CreateCategory"
+              $ref: "difinitions.yaml#/components/schemas/CreateTag"
         required: true
       responses:
         201:
@@ -39,23 +39,23 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "difinitions.yaml#/components/schemas/Category"
+                $ref: "difinitions.yaml#/components/schemas/Tag"
         400:
           description: Invalid request provided
         500:
           description: Unexpected Error
     patch:
       tags:
-        - Category
-      summary: Update category (available only for admins)
+        - Tags
+      summary: Update Tag (available only for admins)
       security:
         - cookieAuth: []
       requestBody:
-        description: Category update request
+        description: Tag update request
         content:
           application/json:
             schema:
-              $ref: "difinitions.yaml#/components/schemas/Category"
+              $ref: "difinitions.yaml#/components/schemas/Tag"
         required: true
       responses:
         200:
@@ -65,20 +65,20 @@ paths:
         500:
           description: Unexpected Error
 
-  /categories/{id}:
+  /tags/{id}:
     delete:
       security:
         - cookieAuth: []
       tags:
-        - Category
-      summary: Delete category (available only for admins)
+        - Tags
+      summary: Delete Tag (available only for admins)
       parameters:
         - in: path
           name: id
           required: true
           schema: 
             type: integer
-          description: Category delete request
+          description: Tag delete request
       responses:
         200:
           description: Successful operation

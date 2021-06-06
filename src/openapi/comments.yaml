@@ -1,37 +1,39 @@
 openapi: 3.0.1
 info:
   title: NewSite Rest API
-  description: Categories
+  description: Comments
   version: 1.0.0
 paths:
-  /categories/:
+  /comments/:
     get:
       tags:
-        - Category
-      summary: All available categories
+        - Comments
+      summary: All available comments (available only for admins)
+      security:
+        - cookieAuth: []
       responses:
         200:
-          description: A list of categories.
+          description: A list of comments.
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: "difinitions.yaml#/components/schemas/Category"
+                  $ref: "difinitions.yaml#/components/schemas/Comment"
         500:
           description: Unexpected Error
     post:
       tags:
-        - Category
-      summary: Add a new category (available only for admins)
+        - Comments
+      summary: Add a new Comment
       security:
         - cookieAuth: []
       requestBody:
-        description: Category create request
+        description: Comment create request
         content:
           application/json:
             schema:
-              $ref: "difinitions.yaml#/components/schemas/CreateCategory"
+              $ref: "difinitions.yaml#/components/schemas/CreateComment"
         required: true
       responses:
         201:
@@ -39,23 +41,23 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "difinitions.yaml#/components/schemas/Category"
+                $ref: "difinitions.yaml#/components/schemas/Comment"
         400:
           description: Invalid request provided
         500:
           description: Unexpected Error
     patch:
       tags:
-        - Category
-      summary: Update category (available only for admins)
+        - Comments
+      summary: Update Comment
       security:
         - cookieAuth: []
       requestBody:
-        description: Category update request
+        description: Comment update request
         content:
           application/json:
             schema:
-              $ref: "difinitions.yaml#/components/schemas/Category"
+              $ref: "difinitions.yaml#/components/schemas/Comment"
         required: true
       responses:
         200:
@@ -65,20 +67,20 @@ paths:
         500:
           description: Unexpected Error
 
-  /categories/{id}:
+  /comments/{id}:
     delete:
       security:
         - cookieAuth: []
       tags:
-        - Category
-      summary: Delete category (available only for admins)
+        - Comments
+      summary: Delete Comment
       parameters:
         - in: path
           name: id
           required: true
           schema: 
             type: integer
-          description: Category delete request
+          description: Comment delete request
       responses:
         200:
           description: Successful operation

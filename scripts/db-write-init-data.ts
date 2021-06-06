@@ -8,6 +8,9 @@ dotenv.config();
 import { initCategoryData } from '../src/models/category';
 import { initUserData } from '../src/models/user';
 import { initAuthorData } from '../src/models/author';
+import { initCommentData } from '../src/models/comments';
+import { initNewsData } from '../src/models/news';
+import { initTagData } from '../src/models/tags';
 
 const script = async () => {
   console.log('db initial data started');
@@ -27,7 +30,7 @@ const script = async () => {
       await initUserData(seq, true);
       await initAuthorData(seq);
     };
-    const tasks = [initCategoryData, userTask];
+    const tasks = [initCategoryData, userTask, initTagData, initCommentData, initNewsData];
     const promises: Promise<any>[] = tasks.map(task => task(sequelize));
     await Promise.all(promises);
 

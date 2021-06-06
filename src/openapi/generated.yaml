@@ -4,144 +4,6 @@ info:
   description: MetaNews is a news site
   version: 1.0.0
 paths:
-  /categories/:
-    get:
-      tags:
-        - Category
-      summary: All available categories
-      responses:
-        '200':
-          description: A list of categories.
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  allOf:
-                    - type: object
-                      properties:
-                        parentCategoryId:
-                          nullable: true
-                          type: integer
-                        label:
-                          type: string
-                      required:
-                        - label
-                        - parentCategoryId
-                    - type: object
-                      properties:
-                        id:
-                          type: integer
-                      required:
-                        - id
-        '500':
-          description: Unexpected Error
-    post:
-      tags:
-        - Category
-      summary: Add a new category
-      security:
-        - cookieAuth: []
-      requestBody:
-        description: Category create request (available only for admins)
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                parentCategoryId:
-                  nullable: true
-                  type: integer
-                label:
-                  type: string
-              required:
-                - label
-                - parentCategoryId
-        required: true
-      responses:
-        '201':
-          description: Successful operation
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - type: object
-                    properties:
-                      parentCategoryId:
-                        nullable: true
-                        type: integer
-                      label:
-                        type: string
-                    required:
-                      - label
-                      - parentCategoryId
-                  - type: object
-                    properties:
-                      id:
-                        type: integer
-                    required:
-                      - id
-        '400':
-          description: Invalid request provided
-        '500':
-          description: Unexpected Error
-    put:
-      tags:
-        - Category
-      summary: Update category
-      security:
-        - cookieAuth: []
-      requestBody:
-        description: Category update request (available only for admins)
-        content:
-          application/json:
-            schema:
-              allOf:
-                - type: object
-                  properties:
-                    parentCategoryId:
-                      nullable: true
-                      type: integer
-                    label:
-                      type: string
-                  required:
-                    - label
-                    - parentCategoryId
-                - type: object
-                  properties:
-                    id:
-                      type: integer
-                  required:
-                    - id
-        required: true
-      responses:
-        '200':
-          description: Successful operation
-        '400':
-          description: Invalid request provided
-        '500':
-          description: Unexpected Error
-  '/categories/{id}':
-    delete:
-      security:
-        - cookieAuth: []
-      tags:
-        - Category
-      summary: Delete category (available only for admins)
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: integer
-          description: Category delete request
-      responses:
-        '200':
-          description: Successful operation
-        '400':
-          description: Invalid request provided
-        '500':
-          description: Unexpected Error
   /users/:
     get:
       tags:
@@ -584,6 +446,875 @@ paths:
           schema:
             type: integer
           description: Author delete request
+      responses:
+        '200':
+          description: Successful operation
+        '400':
+          description: Invalid request provided
+        '500':
+          description: Unexpected Error
+  /posts/:
+    get:
+      tags:
+        - News
+      summary: All available news
+      responses:
+        '200':
+          description: A list of news.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    title:
+                      type: string
+                    createdAt:
+                      type: string
+                      format: date
+                      description: Creation date
+                      example: '2021-01-30'
+                    author:
+                      allOf:
+                        - allOf:
+                            - type: object
+                              properties:
+                                userId:
+                                  type: integer
+                                description:
+                                  type: string
+                              required:
+                                - userId
+                                - description
+                            - type: object
+                              properties:
+                                id:
+                                  type: integer
+                              required:
+                                - id
+                        - allOf:
+                            - type: object
+                              properties:
+                                username:
+                                  type: string
+                                firstName:
+                                  type: string
+                                lastName:
+                                  type: string
+                                avatarUrl:
+                                  type: string
+                              required:
+                                - username
+                                - firstName
+                                - lastName
+                                - avatarUrl
+                            - type: object
+                              properties:
+                                id:
+                                  type: integer
+                                isAdmin:
+                                  type: boolean
+                              required:
+                                - id
+                                - isAdmin
+                    category:
+                      allOf:
+                        - type: object
+                          properties:
+                            parentCategoryId:
+                              nullable: true
+                              type: integer
+                            label:
+                              type: string
+                          required:
+                            - label
+                            - parentCategoryId
+                        - type: object
+                          properties:
+                            id:
+                              type: integer
+                          required:
+                            - id
+                    tags:
+                      type: array
+                      uniqueItems: true
+                      minItems: 1
+                      maxItems: 10
+                      items:
+                        allOf:
+                          - type: object
+                            properties:
+                              label:
+                                type: string
+                            required:
+                              - label
+                          - type: object
+                            properties:
+                              id:
+                                type: integer
+                            required:
+                              - id
+                    content:
+                      type: string
+                    topPhotoLink:
+                      type: string
+                    photoLinks:
+                      type: array
+                      uniqueItems: true
+                      minItems: 0
+                      maxItems: 10
+                      items:
+                        type: string
+                    isDraft:
+                      type: boolean
+                  required:
+                    - title
+                    - createdAt
+                    - author
+                    - category
+                    - tags
+                    - content
+                    - topPhotoLink
+                    - photoLinks
+                    - isDraft
+        '500':
+          description: Unexpected Error
+    post:
+      tags:
+        - News
+      summary: Add a new News
+      security:
+        - cookieAuth: []
+      requestBody:
+        description: News create request
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                categoryId:
+                  type: number
+                tagsIds:
+                  type: array
+                  uniqueItems: true
+                  minItems: 1
+                  maxItems: 10
+                  items:
+                    type: number
+                content:
+                  type: string
+                topPhotoLink:
+                  type: string
+                photoLinks:
+                  type: array
+                  uniqueItems: true
+                  minItems: 0
+                  maxItems: 10
+                  items:
+                    type: string
+                isDraft:
+                  type: boolean
+              required:
+                - title
+                - categoryId
+                - tagsIds
+                - content
+                - topPhotoLink
+                - photoLinks
+                - isDraft
+        required: true
+      responses:
+        '201':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - type: object
+                    properties:
+                      title:
+                        type: string
+                      categoryId:
+                        type: number
+                      tagsIds:
+                        type: array
+                        uniqueItems: true
+                        minItems: 1
+                        maxItems: 10
+                        items:
+                          type: number
+                      content:
+                        type: string
+                      topPhotoLink:
+                        type: string
+                      photoLinks:
+                        type: array
+                        uniqueItems: true
+                        minItems: 0
+                        maxItems: 10
+                        items:
+                          type: string
+                      isDraft:
+                        type: boolean
+                    required:
+                      - title
+                      - categoryId
+                      - tagsIds
+                      - content
+                      - topPhotoLink
+                      - photoLinks
+                      - isDraft
+                  - type: object
+                    properties:
+                      id:
+                        type: integer
+                      createdAt:
+                        type: string
+                        format: date
+                        description: Creation date
+                        example: '2021-01-30'
+                      authorId:
+                        type: number
+                    required:
+                      - id
+                      - createdAt
+                      - authorId
+        '400':
+          description: Invalid request provided
+        '500':
+          description: Unexpected Error
+    put:
+      tags:
+        - News
+      summary: Update News
+      security:
+        - cookieAuth: []
+      requestBody:
+        description: News update request
+        content:
+          application/json:
+            schema:
+              allOf:
+                - type: object
+                  properties:
+                    title:
+                      type: string
+                    categoryId:
+                      type: number
+                    tagsIds:
+                      type: array
+                      uniqueItems: true
+                      minItems: 1
+                      maxItems: 10
+                      items:
+                        type: number
+                    content:
+                      type: string
+                    topPhotoLink:
+                      type: string
+                    photoLinks:
+                      type: array
+                      uniqueItems: true
+                      minItems: 0
+                      maxItems: 10
+                      items:
+                        type: string
+                    isDraft:
+                      type: boolean
+                  required:
+                    - title
+                    - categoryId
+                    - tagsIds
+                    - content
+                    - topPhotoLink
+                    - photoLinks
+                    - isDraft
+                - type: object
+                  properties:
+                    id:
+                      type: integer
+                    createdAt:
+                      type: string
+                      format: date
+                      description: Creation date
+                      example: '2021-01-30'
+                    authorId:
+                      type: number
+                  required:
+                    - id
+                    - createdAt
+                    - authorId
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+        '400':
+          description: Invalid request provided
+        '500':
+          description: Unexpected Error
+  '/posts/{id}':
+    get:
+      tags:
+        - News
+      responses:
+        '200':
+          description: One post.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  title:
+                    type: string
+                  createdAt:
+                    type: string
+                    format: date
+                    description: Creation date
+                    example: '2021-01-30'
+                  author:
+                    allOf:
+                      - allOf:
+                          - type: object
+                            properties:
+                              userId:
+                                type: integer
+                              description:
+                                type: string
+                            required:
+                              - userId
+                              - description
+                          - type: object
+                            properties:
+                              id:
+                                type: integer
+                            required:
+                              - id
+                      - allOf:
+                          - type: object
+                            properties:
+                              username:
+                                type: string
+                              firstName:
+                                type: string
+                              lastName:
+                                type: string
+                              avatarUrl:
+                                type: string
+                            required:
+                              - username
+                              - firstName
+                              - lastName
+                              - avatarUrl
+                          - type: object
+                            properties:
+                              id:
+                                type: integer
+                              isAdmin:
+                                type: boolean
+                            required:
+                              - id
+                              - isAdmin
+                  category:
+                    allOf:
+                      - type: object
+                        properties:
+                          parentCategoryId:
+                            nullable: true
+                            type: integer
+                          label:
+                            type: string
+                        required:
+                          - label
+                          - parentCategoryId
+                      - type: object
+                        properties:
+                          id:
+                            type: integer
+                        required:
+                          - id
+                  tags:
+                    type: array
+                    uniqueItems: true
+                    minItems: 1
+                    maxItems: 10
+                    items:
+                      allOf:
+                        - type: object
+                          properties:
+                            label:
+                              type: string
+                          required:
+                            - label
+                        - type: object
+                          properties:
+                            id:
+                              type: integer
+                          required:
+                            - id
+                  content:
+                    type: string
+                  topPhotoLink:
+                    type: string
+                  photoLinks:
+                    type: array
+                    uniqueItems: true
+                    minItems: 0
+                    maxItems: 10
+                    items:
+                      type: string
+                  isDraft:
+                    type: boolean
+                required:
+                  - title
+                  - createdAt
+                  - author
+                  - category
+                  - tags
+                  - content
+                  - topPhotoLink
+                  - photoLinks
+                  - isDraft
+        '500':
+          description: Unexpected Error
+    delete:
+      security:
+        - cookieAuth: []
+      tags:
+        - News
+      summary: Delete News (available only for admins)
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: News delete request
+      responses:
+        '200':
+          description: Successful operation
+        '400':
+          description: Invalid request provided
+        '500':
+          description: Unexpected Error
+  /comments/:
+    get:
+      tags:
+        - Comments
+      summary: All available comments (available only for admins)
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: A list of comments.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  allOf:
+                    - type: object
+                      properties:
+                        newsId:
+                          type: number
+                        content:
+                          type: string
+                      required:
+                        - newsId
+                        - content
+                    - type: object
+                      properties:
+                        id:
+                          type: integer
+                        userId:
+                          type: number
+                        createdAt:
+                          type: string
+                          format: date
+                          description: Creation date
+                          example: '2021-01-30'
+                      required:
+                        - id
+                        - userId
+                        - createdAt
+        '500':
+          description: Unexpected Error
+    post:
+      tags:
+        - Comments
+      summary: Add a new Comment
+      security:
+        - cookieAuth: []
+      requestBody:
+        description: Comment create request
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                newsId:
+                  type: number
+                content:
+                  type: string
+              required:
+                - newsId
+                - content
+        required: true
+      responses:
+        '201':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - type: object
+                    properties:
+                      newsId:
+                        type: number
+                      content:
+                        type: string
+                    required:
+                      - newsId
+                      - content
+                  - type: object
+                    properties:
+                      id:
+                        type: integer
+                      userId:
+                        type: number
+                      createdAt:
+                        type: string
+                        format: date
+                        description: Creation date
+                        example: '2021-01-30'
+                    required:
+                      - id
+                      - userId
+                      - createdAt
+        '400':
+          description: Invalid request provided
+        '500':
+          description: Unexpected Error
+    put:
+      tags:
+        - Comments
+      summary: Update Comment
+      security:
+        - cookieAuth: []
+      requestBody:
+        description: Comment update request
+        content:
+          application/json:
+            schema:
+              allOf:
+                - type: object
+                  properties:
+                    newsId:
+                      type: number
+                    content:
+                      type: string
+                  required:
+                    - newsId
+                    - content
+                - type: object
+                  properties:
+                    id:
+                      type: integer
+                    userId:
+                      type: number
+                    createdAt:
+                      type: string
+                      format: date
+                      description: Creation date
+                      example: '2021-01-30'
+                  required:
+                    - id
+                    - userId
+                    - createdAt
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+        '400':
+          description: Invalid request provided
+        '500':
+          description: Unexpected Error
+  '/comments/{id}':
+    delete:
+      security:
+        - cookieAuth: []
+      tags:
+        - Comments
+      summary: Delete Comment
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: Comment delete request
+      responses:
+        '200':
+          description: Successful operation
+        '400':
+          description: Invalid request provided
+        '500':
+          description: Unexpected Error
+  /categories/:
+    get:
+      tags:
+        - Category
+      summary: All available categories
+      responses:
+        '200':
+          description: A list of categories.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  allOf:
+                    - type: object
+                      properties:
+                        parentCategoryId:
+                          nullable: true
+                          type: integer
+                        label:
+                          type: string
+                      required:
+                        - label
+                        - parentCategoryId
+                    - type: object
+                      properties:
+                        id:
+                          type: integer
+                      required:
+                        - id
+        '500':
+          description: Unexpected Error
+    post:
+      tags:
+        - Category
+      summary: Add a new category (available only for admins)
+      security:
+        - cookieAuth: []
+      requestBody:
+        description: Category create request
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                parentCategoryId:
+                  nullable: true
+                  type: integer
+                label:
+                  type: string
+              required:
+                - label
+                - parentCategoryId
+        required: true
+      responses:
+        '201':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - type: object
+                    properties:
+                      parentCategoryId:
+                        nullable: true
+                        type: integer
+                      label:
+                        type: string
+                    required:
+                      - label
+                      - parentCategoryId
+                  - type: object
+                    properties:
+                      id:
+                        type: integer
+                    required:
+                      - id
+        '400':
+          description: Invalid request provided
+        '500':
+          description: Unexpected Error
+    put:
+      tags:
+        - Category
+      summary: Update category (available only for admins)
+      security:
+        - cookieAuth: []
+      requestBody:
+        description: Category update request
+        content:
+          application/json:
+            schema:
+              allOf:
+                - type: object
+                  properties:
+                    parentCategoryId:
+                      nullable: true
+                      type: integer
+                    label:
+                      type: string
+                  required:
+                    - label
+                    - parentCategoryId
+                - type: object
+                  properties:
+                    id:
+                      type: integer
+                  required:
+                    - id
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+        '400':
+          description: Invalid request provided
+        '500':
+          description: Unexpected Error
+  '/categories/{id}':
+    delete:
+      security:
+        - cookieAuth: []
+      tags:
+        - Category
+      summary: Delete category (available only for admins)
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: Category delete request
+      responses:
+        '200':
+          description: Successful operation
+        '400':
+          description: Invalid request provided
+        '500':
+          description: Unexpected Error
+  /tags/:
+    get:
+      tags:
+        - Tags
+      summary: All available tags
+      responses:
+        '200':
+          description: A list of tags.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  allOf:
+                    - type: object
+                      properties:
+                        label:
+                          type: string
+                      required:
+                        - label
+                    - type: object
+                      properties:
+                        id:
+                          type: integer
+                      required:
+                        - id
+        '500':
+          description: Unexpected Error
+    post:
+      tags:
+        - Tags
+      summary: Add a new Tag (available only for admins)
+      security:
+        - cookieAuth: []
+      requestBody:
+        description: Tag create request
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                label:
+                  type: string
+              required:
+                - label
+        required: true
+      responses:
+        '201':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - type: object
+                    properties:
+                      label:
+                        type: string
+                    required:
+                      - label
+                  - type: object
+                    properties:
+                      id:
+                        type: integer
+                    required:
+                      - id
+        '400':
+          description: Invalid request provided
+        '500':
+          description: Unexpected Error
+    put:
+      tags:
+        - Tags
+      summary: Update Tag (available only for admins)
+      security:
+        - cookieAuth: []
+      requestBody:
+        description: Tag update request
+        content:
+          application/json:
+            schema:
+              allOf:
+                - type: object
+                  properties:
+                    label:
+                      type: string
+                  required:
+                    - label
+                - type: object
+                  properties:
+                    id:
+                      type: integer
+                  required:
+                    - id
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+        '400':
+          description: Invalid request provided
+        '500':
+          description: Unexpected Error
+  '/tags/{id}':
+    delete:
+      security:
+        - cookieAuth: []
+      tags:
+        - Tags
+      summary: Delete Tag (available only for admins)
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: Tag delete request
       responses:
         '200':
           description: Successful operation

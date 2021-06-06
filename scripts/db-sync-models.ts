@@ -8,6 +8,9 @@ dotenv.config();
 import { createCategoryModel } from '../src/models/category';
 import { createUserModel } from '../src/models/user';
 import { createAuthorModel } from '../src/models/author';
+import { createNewsModel } from '../src/models/news';
+import { createCommentModel } from '../src/models/comments';
+import { createTagModel } from '../src/models/tags';
 
 const script = async () => {
   console.log('db sync models script started');
@@ -15,7 +18,14 @@ const script = async () => {
     host: 'localhost',
     dialect: 'postgres',
   });
-  const modelCreators = [createCategoryModel, createUserModel, createAuthorModel];
+  const modelCreators = [
+    createCategoryModel,
+    createUserModel,
+    createAuthorModel,
+    createNewsModel,
+    createCommentModel,
+    createTagModel,
+  ];
   try {
     await sequelize.authenticate();
     console.log('Connection has been established successfully.');

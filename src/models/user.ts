@@ -51,18 +51,12 @@ export const userViewAttributes: Array<keyof UserView> = [
 export const getUserViewFromInstance = (instance: UserInstance): UserView =>
   R.pick<keyof UserView>(userViewAttributes)(instance);
 
-export const createUserToModel = async ({
-  password,
-  ...rest
-}: CreateUser): Promise<Omit<UserModel, 'id'>> => {
-  const passwordHash = await getHash(password);
-  return {
-    ...rest,
-    passwordHash,
-    isAdmin: false,
-    tokenCounter: 0,
-  };
-};
+export const createUserToModel = ({ password, ...rest }: CreateUser): Omit<UserModel, 'id'> => ({
+  ...rest,
+  passwordHash: getHash(password),
+  isAdmin: false,
+  tokenCounter: 0,
+});
 
 export const initialCategories: Array<CreateUser & { isAdmin: boolean }> = [
   {
@@ -98,7 +92,7 @@ export const initUserData = async (sequelize: Sequelize, isDropTable: boolean) =
   }
   await model.sync({ force: true });
   const promises = initialCategories.map(async data => {
-    const userModel = await createUserToModel(data);
+    const userModel = createUserToModel(data);
     await model.create({ ...userModel, isAdmin: data.isAdmin });
   });
   return Promise.all(promises);

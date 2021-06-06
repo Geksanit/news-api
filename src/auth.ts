@@ -21,7 +21,7 @@ export const initializeAuth = (app: core.Express, sequelize: Sequelize) => {
       if (!user) {
         return done(null, false);
       }
-      const passwordHash = await getHash(password);
+      const passwordHash = getHash(password);
       if (passwordHash === user.passwordHash) {
         return done(null, { id: user.id });
       }

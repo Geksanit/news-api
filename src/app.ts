@@ -14,6 +14,9 @@ dotenv.config();
 import * as categories from './modules/categories';
 import * as users from './modules/users';
 import * as authors from './modules/authors';
+import * as news from './modules/news';
+import * as comments from './modules/comments';
+import * as tags from './modules/tags';
 import { log } from './libs/log';
 import { errorHandler } from './middlewares/errorHandler';
 import { initializeAuth } from './auth';
@@ -49,6 +52,9 @@ app.use(
 
 initializeAuth(app, sequelize);
 
+app.use('/posts', news.makeRouter(sequelize));
+app.use('/comments', comments.makeRouter(sequelize));
+app.use('/tags', tags.makeRouter(sequelize));
 app.use('/categories', categories.makeRouter(sequelize));
 app.use('/users', users.makeRouter(sequelize));
 app.use('/authors', authors.makeRouter(sequelize));
