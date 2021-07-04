@@ -52,15 +52,15 @@ export const initialCategories: CreateCategory[] = [
     label: 'sports',
   },
   {
-    parentCategoryId: 3,
+    parentCategoryId: 4,
     label: 'auto sport',
   },
   {
-    parentCategoryId: 4,
+    parentCategoryId: 5,
     label: 'Formula 1',
   },
   {
-    parentCategoryId: 4,
+    parentCategoryId: 5,
     label: 'Rally sport',
   },
 ];

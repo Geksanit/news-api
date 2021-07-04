@@ -16,8 +16,12 @@ paths:
     $ref: 'authors.yaml#/paths/~1authors~1'
   /authors/{id}:
     $ref: 'authors.yaml#/paths/~1authors~1{id}'
+  /posts/raw/:
+    $ref: 'news.yaml#/paths/~1posts~1raw~1'
   /posts/:
     $ref: 'news.yaml#/paths/~1posts~1'
+  /posts/my-drafts/:
+    $ref: 'news.yaml#/paths/~1posts~1my-drafts~1'
   /posts/{id}:
     $ref: 'news.yaml#/paths/~1posts~1{id}'
   /comments/:

@@ -9,6 +9,80 @@ paths:
       tags:
         - News
       summary: All available news
+      parameters:
+        - in: query
+          name: offset
+          required: true
+          schema:
+            type: integer
+            example: 0
+          description: The number of items to skip before starting to collect the result set
+        - in: query
+          name: limit
+          required: true
+          schema:
+            type: integer
+            example: 5
+          description: The numbers of items to return
+        - in: query
+          name: categoryId
+          required: false
+          schema:
+            type: number
+        - in: query
+          name: authorName
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: title
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: content
+          required: false
+          schema:
+            type: string
+
+        - in: query
+          name: tag
+          required: false
+          schema:
+            type: number
+        - in: query
+          name: tags__in
+          required: false
+          schema:
+            type: array
+            items: 
+              type: number
+        - in: query
+          name: tags__all
+          required: false
+          schema:
+            type: array
+            items: 
+              type: number
+
+        - in: query
+          name: created_at
+          required: false
+          schema:
+            type: string
+            format: date
+        - in: query
+          name: created_at__lt
+          required: false
+          schema:
+            type: string
+            format: date # express-openapi-validator fail validation
+        - in: query
+          name: created_at__gt
+          required: false
+          schema:
+            type: string
+            format: date
       responses:
         200:
           description: A list of news.
@@ -96,5 +170,71 @@ paths:
           description: Successful operation
         400:
           description: Invalid request provided
+        500:
+          description: Unexpected Error
+  /posts/raw/:
+    get:
+      tags:
+        - News
+      summary: All available news (available only for admins)
+      security:
+        - cookieAuth: []
+      parameters:
+        - in: query
+          name: offset
+          required: true
+          schema:
+            type: integer
+            example: 0
+          description: The number of items to skip before starting to collect the result set
+        - in: query
+          name: limit
+          required: true
+          schema:
+            type: integer
+            example: 5
+          description: The numbers of items to return
+      responses:
+        200:
+          description: A list of news.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "difinitions.yaml#/components/schemas/News"
+        500:
+          description: Unexpected Error
+  /posts/my-drafts/:
+    get:
+      tags:
+        - News
+      summary: my drafts
+      security:
+        - cookieAuth: []
+      parameters:
+        - in: query
+          name: offset
+          required: true
+          schema:
+            type: integer
+            example: 0
+          description: The number of items to skip before starting to collect the result set
+        - in: query
+          name: limit
+          required: true
+          schema:
+            type: integer
+            example: 5
+          description: The numbers of items to return
+      responses:
+        200:
+          description: A list of news.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "difinitions.yaml#/components/schemas/News"
         500:
           description: Unexpected Error

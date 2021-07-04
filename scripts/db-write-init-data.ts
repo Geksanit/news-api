@@ -31,7 +31,7 @@ const script = async () => {
       await initAuthorData(seq);
     };
     const tasks = [initCategoryData, userTask, initTagData, initCommentData, initNewsData];
-    const promises: Promise<any>[] = tasks.map(task => task(sequelize));
+    const promises: Promise<any>[] = tasks.map(task => task(sequelize, true));
     await Promise.all(promises);
 
     console.log('script completed');

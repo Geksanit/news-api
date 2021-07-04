@@ -46,6 +46,12 @@ export const initialTags: CreateTag[] = [
   {
     label: 'media',
   },
+  {
+    label: 'F1',
+  },
+  {
+    label: 'auto',
+  },
 ];
 
 export const initTagData = async (sequelize: Sequelize) => {

@@ -1,12 +1,31 @@
 import express from 'express';
-import { Sequelize } from 'sequelize/types';
+import { Sequelize, QueryTypes } from 'sequelize';
 
 import { HttpError } from '../../utils/Errors';
 import { createLogger } from '../../middlewares/logger';
-import { createNewsModel, createNewsToModel, getNewsFromInstance } from '../../models/news';
+import {
+  createNewsModel,
+  createNewsToModel,
+  getNewsFromInstance,
+  newsAttributes,
+} from '../../models/news';
 import { authenticateAdmin, authenticateUser } from '../../middlewares/authenticate';
-import { CreateNews, News, UserView } from '../../types/generated';
+import { CreateNews, News, Pagination, UserView } from '../../types/generated';
 import { createAuthorModel } from '../../models/author';
+import {
+  authorToJSON,
+  categoryToJSON,
+  CreatedAtFilter,
+  Filters,
+  getAuthorFilter,
+  getCreatedAtFilter,
+  getTagFilter,
+  TagFilter,
+  tagsToJSON,
+} from './model';
+
+// const t: null | number = null;
+// export const tt: number = t; // FTW?
 
 export const makeRouter = (sequelize: Sequelize) => {
   const NewsModel = createNewsModel(sequelize);
@@ -14,22 +33,82 @@ export const makeRouter = (sequelize: Sequelize) => {
   const router = express.Router();
   router.use(createLogger(module));
 
+  router.get('/raw/', authenticateAdmin, async (req, res, next) => {
+    try {
+      const { limit, offset } = (req.query as unknown) as Pagination;
+      const news = await NewsModel.findAll({
+        limit,
+        offset,
+        attributes: newsAttributes,
+      });
+      res.json(news.map(getNewsFromInstance));
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  router.get('/my-drafts/', authenticateUser, async (req, res, next) => {
+    try {
+      const user = req.user as UserView;
+      const { limit, offset } = (req.query as unknown) as Pagination;
+      const news = await NewsModel.findAll({
+        limit,
+        offset,
+        attributes: newsAttributes,
+        where: {
+          authorId: user.id,
+          isDraft: true,
+        },
+      });
+      res.json(news.map(getNewsFromInstance));
+    } catch (error) {
+      next(error);
+    }
+  });
+
   router.get('/', async (req, res, next) => {
     try {
-      const news = await NewsModel.findAll({
-        attributes: ['id', 'label'],
-      });
-      res.json(news);
+      const { limit, offset } = (req.query as unknown) as Pagination;
+      const { categoryId, title, content, authorName } = (req.query as unknown) as Filters;
+
+      const filters = [
+        'true', // for empty all filters
+        getTagFilter((req.query as unknown) as TagFilter),
+        getCreatedAtFilter((req.query as unknown) as CreatedAtFilter),
+        getAuthorFilter(authorName),
+        categoryId ? `${categoryId} = n."categoryId"` : null,
+        title ? `n.title LIKE '%${title}%'` : null,
+        content ? `n.content LIKE '%${content}%'` : null,
+      ]
+        .filter(f => f !== null)
+        .join(' AND ');
+
+      const fullNews = await sequelize.query(
+        `
+          SELECT n.id, (${authorToJSON}) as author, (${categoryToJSON}) as category, ARRAY(${tagsToJSON}) as tags,
+            n."createdAt", n.title, n.content, n."topPhotoLink", n."photoLinks", n."isDraft"
+          FROM "News" as n
+          WHERE ${filters}
+          ORDER BY n.id DESC
+          LIMIT ${limit}
+          OFFSET ${offset}
+          `,
+        {
+          nest: true,
+          type: QueryTypes.SELECT,
+        },
+      );
+      res.json(fullNews);
     } catch (error) {
       next(error);
     }
   });
   router.get('/:id', async (req, res, next) => {
     try {
-      const news = await NewsModel.findAll({
-        attributes: ['id', 'label'],
+      const news = await NewsModel.findOne({
+        attributes: newsAttributes,
       });
-      res.json(news);
+      res.json(getNewsFromInstance(news));
     } catch (error) {
       next(error);
     }

@@ -31,13 +31,13 @@ export const getCommentFromInstance = (instance: CommentInstance): Comment =>
 
 export const initialCategories: Array<CreateComment & { userId: number }> = [
   {
-    newsId: 0,
-    userId: 0,
+    newsId: 1,
+    userId: 1,
     content: 'comment text 1',
   },
   {
-    newsId: 0,
-    userId: 1,
+    newsId: 1,
+    userId: 2,
     content: 'comment text 2',
   },
 ];

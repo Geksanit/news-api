@@ -131,8 +131,13 @@ components:
             - id
     FullAuthor:
       allOf:
-        - $ref: '#/components/schemas/Author'
         - $ref: '#/components/schemas/UserView'
+        - type: object
+          properties:
+            description: 
+              type: string
+          required:
+            - description
 
     CreateAuthor:
       type: object
@@ -226,16 +231,16 @@ components:
           description: Creation date
           example: "2021-01-30"
         author:
-          $ref: "difinitions.yaml#/components/schemas/FullAuthor"
+          $ref: "#/components/schemas/FullAuthor"
         category:
-          $ref: "difinitions.yaml#/components/schemas/Category"
+          $ref: "#/components/schemas/Category"
         tags:
           type: array
           uniqueItems: true
           minItems: 1
           maxItems: 10
           items:
-            $ref: "difinitions.yaml#/components/schemas/Tag"
+            $ref: "#/components/schemas/Tag"
         content:
           type: string
         topPhotoLink:
@@ -288,4 +293,15 @@ components:
       required:
         - newsId
         - content
+
+    Pagination:
+      type: object
+      properties:
+        limit:
+          type: integer
+        offset: 
+          type: integer
+      required:
+        - limit
+        - offset
         

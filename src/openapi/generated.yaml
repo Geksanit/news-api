@@ -453,11 +453,169 @@ paths:
           description: Invalid request provided
         '500':
           description: Unexpected Error
+  /posts/raw/:
+    get:
+      tags:
+        - News
+      summary: All available news (available only for admins)
+      security:
+        - cookieAuth: []
+      parameters:
+        - in: query
+          name: offset
+          required: true
+          schema:
+            type: integer
+            example: 0
+          description: >-
+            The number of items to skip before starting to collect the result
+            set
+        - in: query
+          name: limit
+          required: true
+          schema:
+            type: integer
+            example: 5
+          description: The numbers of items to return
+      responses:
+        '200':
+          description: A list of news.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  allOf:
+                    - type: object
+                      properties:
+                        title:
+                          type: string
+                        categoryId:
+                          type: number
+                        tagsIds:
+                          type: array
+                          uniqueItems: true
+                          minItems: 1
+                          maxItems: 10
+                          items:
+                            type: number
+                        content:
+                          type: string
+                        topPhotoLink:
+                          type: string
+                        photoLinks:
+                          type: array
+                          uniqueItems: true
+                          minItems: 0
+                          maxItems: 10
+                          items:
+                            type: string
+                        isDraft:
+                          type: boolean
+                      required:
+                        - title
+                        - categoryId
+                        - tagsIds
+                        - content
+                        - topPhotoLink
+                        - photoLinks
+                        - isDraft
+                    - type: object
+                      properties:
+                        id:
+                          type: integer
+                        createdAt:
+                          type: string
+                          format: date
+                          description: Creation date
+                          example: '2021-01-30'
+                        authorId:
+                          type: number
+                      required:
+                        - id
+                        - createdAt
+                        - authorId
+        '500':
+          description: Unexpected Error
   /posts/:
     get:
       tags:
         - News
       summary: All available news
+      parameters:
+        - in: query
+          name: offset
+          required: true
+          schema:
+            type: integer
+            example: 0
+          description: >-
+            The number of items to skip before starting to collect the result
+            set
+        - in: query
+          name: limit
+          required: true
+          schema:
+            type: integer
+            example: 5
+          description: The numbers of items to return
+        - in: query
+          name: categoryId
+          required: false
+          schema:
+            type: number
+        - in: query
+          name: authorName
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: title
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: content
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: tag
+          required: false
+          schema:
+            type: number
+        - in: query
+          name: tags__in
+          required: false
+          schema:
+            type: array
+            items:
+              type: number
+        - in: query
+          name: tags__all
+          required: false
+          schema:
+            type: array
+            items:
+              type: number
+        - in: query
+          name: created_at
+          required: false
+          schema:
+            type: string
+            format: date
+        - in: query
+          name: created_at__lt
+          required: false
+          schema:
+            type: string
+            format: date
+        - in: query
+          name: created_at__gt
+          required: false
+          schema:
+            type: string
+            format: date
       responses:
         '200':
           description: A list of news.
@@ -477,22 +635,6 @@ paths:
                       example: '2021-01-30'
                     author:
                       allOf:
-                        - allOf:
-                            - type: object
-                              properties:
-                                userId:
-                                  type: integer
-                                description:
-                                  type: string
-                              required:
-                                - userId
-                                - description
-                            - type: object
-                              properties:
-                                id:
-                                  type: integer
-                              required:
-                                - id
                         - allOf:
                             - type: object
                               properties:
@@ -518,6 +660,12 @@ paths:
                               required:
                                 - id
                                 - isAdmin
+                        - type: object
+                          properties:
+                            description:
+                              type: string
+                          required:
+                            - description
                     category:
                       allOf:
                         - type: object
@@ -686,7 +834,7 @@ paths:
           description: Invalid request provided
         '500':
           description: Unexpected Error
-    put:
+    patch:
       tags:
         - News
       summary: Update News
@@ -755,6 +903,90 @@ paths:
           description: Invalid request provided
         '500':
           description: Unexpected Error
+  /posts/my-drafts/:
+    get:
+      tags:
+        - News
+      summary: my drafts
+      security:
+        - cookieAuth: []
+      parameters:
+        - in: query
+          name: offset
+          required: true
+          schema:
+            type: integer
+            example: 0
+          description: >-
+            The number of items to skip before starting to collect the result
+            set
+        - in: query
+          name: limit
+          required: true
+          schema:
+            type: integer
+            example: 5
+          description: The numbers of items to return
+      responses:
+        '200':
+          description: A list of news.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  allOf:
+                    - type: object
+                      properties:
+                        title:
+                          type: string
+                        categoryId:
+                          type: number
+                        tagsIds:
+                          type: array
+                          uniqueItems: true
+                          minItems: 1
+                          maxItems: 10
+                          items:
+                            type: number
+                        content:
+                          type: string
+                        topPhotoLink:
+                          type: string
+                        photoLinks:
+                          type: array
+                          uniqueItems: true
+                          minItems: 0
+                          maxItems: 10
+                          items:
+                            type: string
+                        isDraft:
+                          type: boolean
+                      required:
+                        - title
+                        - categoryId
+                        - tagsIds
+                        - content
+                        - topPhotoLink
+                        - photoLinks
+                        - isDraft
+                    - type: object
+                      properties:
+                        id:
+                          type: integer
+                        createdAt:
+                          type: string
+                          format: date
+                          description: Creation date
+                          example: '2021-01-30'
+                        authorId:
+                          type: number
+                      required:
+                        - id
+                        - createdAt
+                        - authorId
+        '500':
+          description: Unexpected Error
   '/posts/{id}':
     get:
       tags:
@@ -776,22 +1008,6 @@ paths:
                     example: '2021-01-30'
                   author:
                     allOf:
-                      - allOf:
-                          - type: object
-                            properties:
-                              userId:
-                                type: integer
-                              description:
-                                type: string
-                            required:
-                              - userId
-                              - description
-                          - type: object
-                            properties:
-                              id:
-                                type: integer
-                            required:
-                              - id
                       - allOf:
                           - type: object
                             properties:
@@ -817,6 +1033,12 @@ paths:
                             required:
                               - id
                               - isAdmin
+                      - type: object
+                        properties:
+                          description:
+                            type: string
+                        required:
+                          - description
                   category:
                     allOf:
                       - type: object
@@ -997,7 +1219,7 @@ paths:
           description: Invalid request provided
         '500':
           description: Unexpected Error
-    put:
+    patch:
       tags:
         - Comments
       summary: Update Comment
@@ -1143,7 +1365,7 @@ paths:
           description: Invalid request provided
         '500':
           description: Unexpected Error
-    put:
+    patch:
       tags:
         - Category
       summary: Update category (available only for admins)
@@ -1269,7 +1491,7 @@ paths:
           description: Invalid request provided
         '500':
           description: Unexpected Error
-    put:
+    patch:
       tags:
         - Tags
       summary: Update Tag (available only for admins)

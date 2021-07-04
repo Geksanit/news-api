@@ -30,7 +30,7 @@ export const getAuthorFromInstance = (instance: AuthorInstance): Author =>
 
 export const initialCategories: CreateAuthor[] = [
   {
-    userId: 0,
+    userId: 1,
     description: 'First author on site',
   },
   {
