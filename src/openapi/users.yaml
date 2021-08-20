@@ -9,6 +9,21 @@ paths:
       tags:
         - Users
       summary: List all users (available only for admins)
+      parameters:
+        - in: query
+          name: offset
+          required: true
+          schema:
+            type: integer
+            example: 0
+          description: The number of items to skip before starting to collect the result set
+        - in: query
+          name: limit
+          required: true
+          schema:
+            type: integer
+            example: 5
+          description: The numbers of items to return
       security:
         - cookieAuth: []
       responses:

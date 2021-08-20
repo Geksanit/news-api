@@ -12,6 +12,7 @@ import {
 } from '../../models/user';
 import { getToken } from '../../libs/token';
 import { authenticateAdmin, authenticateUser } from '../../middlewares/authenticate';
+import { Pagination } from '../../types/generated';
 
 export const makeRouter = (sequelize: Sequelize) => {
   const UserModel = createUserModel(sequelize);
@@ -44,7 +45,8 @@ export const makeRouter = (sequelize: Sequelize) => {
 
   router.get('/', authenticateAdmin, async (req, res, next) => {
     try {
-      const users = await UserModel.findAll({ attributes: userViewAttributes });
+      const { limit, offset } = (req.query as unknown) as Pagination;
+      const users = await UserModel.findAll({ limit, offset, attributes: userViewAttributes });
       res.json(users);
     } catch (error) {
       next(error);

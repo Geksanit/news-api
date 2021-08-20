@@ -6,7 +6,7 @@ import { createLogger } from '../../middlewares/logger';
 import { createCommentModel, getCommentFromInstance } from '../../models/comments';
 import { authenticateAdmin, authenticateUser } from '../../middlewares/authenticate';
 import { createNewsModel } from '../../models/news';
-import { CreateComment, UserView, Comment } from '../../types/generated';
+import { CreateComment, UserView, Comment, Pagination } from '../../types/generated';
 
 export const makeRouter = (sequelize: Sequelize) => {
   const CommentModel = createCommentModel(sequelize);
@@ -16,7 +16,10 @@ export const makeRouter = (sequelize: Sequelize) => {
 
   router.get('/', authenticateAdmin, async (req, res, next) => {
     try {
+      const { limit, offset } = (req.query as unknown) as Pagination;
       const comments = await CommentModel.findAll({
+        limit,
+        offset,
         attributes: ['content', 'userId', 'newsId', 'id', 'createdAt'],
       });
       res.json(comments);

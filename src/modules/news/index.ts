@@ -119,6 +119,7 @@ export const makeRouter = (sequelize: Sequelize) => {
   router.get('/:id', async (req, res, next) => {
     try {
       const news = await NewsModel.findOne({
+        where: { id: req.params.id },
         attributes: newsAttributes,
       });
       if (!news) {

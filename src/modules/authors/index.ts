@@ -5,6 +5,7 @@ import { HttpError } from '../../utils/Errors';
 import { createLogger } from '../../middlewares/logger';
 import { createAuthorModel, getAuthorFromInstance, attributes } from '../../models/author';
 import { authenticateAdmin } from '../../middlewares/authenticate';
+import { Pagination } from '../../types/generated';
 
 export const makeRouter = (sequelize: Sequelize) => {
   const AuthorModel = createAuthorModel(sequelize);
@@ -13,7 +14,8 @@ export const makeRouter = (sequelize: Sequelize) => {
 
   router.get('/', authenticateAdmin, async (req, res, next) => {
     try {
-      const authors = await AuthorModel.findAll({ attributes });
+      const { limit, offset } = (req.query as unknown) as Pagination;
+      const authors = await AuthorModel.findAll({ limit, offset, attributes });
       res.json(authors);
     } catch (error) {
       next(error);

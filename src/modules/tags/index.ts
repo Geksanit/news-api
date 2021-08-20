@@ -5,6 +5,7 @@ import { HttpError } from '../../utils/Errors';
 import { createLogger } from '../../middlewares/logger';
 import { createTagModel, getTagFromInstance } from '../../models/tags';
 import { authenticateAdmin } from '../../middlewares/authenticate';
+import { Pagination } from '../../types/generated';
 
 export const makeRouter = (sequelize: Sequelize) => {
   const TagModel = createTagModel(sequelize);
@@ -13,7 +14,10 @@ export const makeRouter = (sequelize: Sequelize) => {
 
   router.get('/', async (req, res, next) => {
     try {
+      const { limit, offset } = (req.query as unknown) as Pagination;
       const tags = await TagModel.findAll({
+        limit,
+        offset,
         attributes: ['id', 'label'],
       });
       res.json(tags);

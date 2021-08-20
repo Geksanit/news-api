@@ -9,6 +9,23 @@ paths:
       tags:
         - Users
       summary: List all users (available only for admins)
+      parameters:
+        - in: query
+          name: offset
+          required: true
+          schema:
+            type: integer
+            example: 0
+          description: >-
+            The number of items to skip before starting to collect the result
+            set
+        - in: query
+          name: limit
+          required: true
+          schema:
+            type: integer
+            example: 5
+          description: The numbers of items to return
       security:
         - cookieAuth: []
       responses:
@@ -288,6 +305,23 @@ paths:
       summary: List all available authors (available only for admins)
       security:
         - cookieAuth: []
+      parameters:
+        - in: query
+          name: offset
+          required: true
+          schema:
+            type: integer
+            example: 0
+          description: >-
+            The number of items to skip before starting to collect the result
+            set
+        - in: query
+          name: limit
+          required: true
+          schema:
+            type: integer
+            example: 5
+          description: The numbers of items to return
       responses:
         '200':
           description: A list of authors.
@@ -1016,6 +1050,14 @@ paths:
     get:
       tags:
         - News
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+            example: 1
+          description: Numeric ID of the news to get
       responses:
         '200':
           description: One post.
@@ -1153,6 +1195,23 @@ paths:
       summary: All available comments (available only for admins)
       security:
         - cookieAuth: []
+      parameters:
+        - in: query
+          name: offset
+          required: true
+          schema:
+            type: integer
+            example: 0
+          description: >-
+            The number of items to skip before starting to collect the result
+            set
+        - in: query
+          name: limit
+          required: true
+          schema:
+            type: integer
+            example: 5
+          description: The numbers of items to return
       responses:
         '200':
           description: A list of comments.
@@ -1314,6 +1373,23 @@ paths:
       tags:
         - Category
       summary: All available categories
+      parameters:
+        - in: query
+          name: offset
+          required: true
+          schema:
+            type: integer
+            example: 0
+          description: >-
+            The number of items to skip before starting to collect the result
+            set
+        - in: query
+          name: limit
+          required: true
+          schema:
+            type: integer
+            example: 5
+          description: The numbers of items to return
       responses:
         '200':
           description: A list of categories.
@@ -1452,6 +1528,23 @@ paths:
       tags:
         - Tags
       summary: All available tags
+      parameters:
+        - in: query
+          name: offset
+          required: true
+          schema:
+            type: integer
+            example: 0
+          description: >-
+            The number of items to skip before starting to collect the result
+            set
+        - in: query
+          name: limit
+          required: true
+          schema:
+            type: integer
+            example: 5
+          description: The numbers of items to return
       responses:
         '200':
           description: A list of tags.

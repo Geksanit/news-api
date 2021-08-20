@@ -157,6 +157,14 @@ paths:
     get:
       tags:
         - News
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+            example: 1
+          description: Numeric ID of the news to get
       responses:
         200:
           description: One post.
