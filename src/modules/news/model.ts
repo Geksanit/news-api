@@ -1,4 +1,5 @@
 import { userViewAttributes } from '../../models/user';
+import { NewsOrder } from '../../types/generated';
 
 export type CreatedAtFilter = {
   created_at: string | undefined;
@@ -40,34 +41,62 @@ export type Filters = {
   categoryId: number | undefined;
   title: string | undefined;
   content: string | undefined;
+  searchText: string | undefined;
 };
 
-export const getAuthorFilter = (authorName: string) =>
-  authorName
-    ? `
-      '${authorName}' = (
-        SELECT u."firstName"
-        FROM "Authors" as a
-        INNER JOIN "Users" as u ON a.id = u.id
-        WHERE a.id = n."authorId"
-      )
-    `
+export const getSearchTextFilter = (text: string | undefined) =>
+  text
+    ? `(
+      n.content LIKE '%${text}%' OR
+      '${text}' = u."firstName" OR
+      '${text}' = c.label OR
+      '${text}' = t.label
+    )`
     : null;
 
-export const tagsToJSON = `SELECT json_build_object('id', t.id, 'label', t.label) as tag
-    FROM "Tags" as t
-    WHERE t.id = ANY (n."tagsIds")
-    `;
+export const tagsToJSON = `
+  SELECT json_build_object('id', t.id, 'label', t.label) as tag
+  FROM "Tags" as t
+  WHERE t.id = ANY (n."tagsIds")
+`;
 
-export const categoryToJSON = `SELECT json_build_object('id', c.id, 'label', c.label, 'parentCategoryId', c."parentCategoryId")
+// old, not recursive query
+// export const categoryToJSON = `SELECT json_build_object('id', c.id, 'label', c.label, 'parentCategoryId', c."parentCategoryId")
+//     FROM "Categories" as c
+//     WHERE c.id = n."categoryId"
+//     `;
+
+export const categoryToJSON = `
+  WITH RECURSIVE r AS (
+    SELECT c.id, c."parentCategoryId", c.label
     FROM "Categories" as c
     WHERE c.id = n."categoryId"
-    `;
+    UNION
+    SELECT c.id, c."parentCategoryId", c.label
+    FROM "Categories" as c
+      JOIN r
+          ON c.id = r."parentCategoryId"
+  )
+  SELECT json_build_object('id', r.id, 'label', r.label, 'parentCategoryId', r."parentCategoryId")
+  FROM r
+`;
 
 const userFields = userViewAttributes.map(f => `'${f}', u."${f}"`).join(', ');
+export const authorToJSON = `json_build_object(${userFields}, 'discription', a.description)`;
 
-export const authorToJSON = `SELECT json_build_object(${userFields}, 'discription', a.description) as author
-    FROM "Authors" as a
-    INNER JOIN "Users" as u ON a.id = u.id
-    WHERE a.id = n."authorId"
-    `;
+export const getOrder = ({
+  by = NewsOrder.by.DATE,
+  direction = NewsOrder.direction.ASC,
+}: NewsOrder): string => {
+  const d = direction.toUpperCase();
+  switch (by) {
+    case NewsOrder.by.DATE:
+      return `BY n."createdAt" ${d}`;
+    case NewsOrder.by.AUTHOR:
+      return `BY u.username ${d}`;
+    case NewsOrder.by.CATEGORY:
+      return `BY c."label" ${d}`;
+    case NewsOrder.by.PHOTO_COUNT:
+      return `BY array_length(n."photoLinks", 1) ${d}`;
+  }
+};

@@ -23,8 +23,10 @@ import { initializeAuth } from './auth';
 
 const apiSpec = path.resolve(__dirname, './openapi/generated.yaml');
 const swaggerDocument = yaml.load(apiSpec);
-
-const sequelize = new Sequelize(process.env.DB_NAME, 'postgres', process.env.DB_PASS, {
+if (!process.env.DB_NAME) {
+  throw new Error('no DB_NAME');
+}
+const sequelize = new Sequelize(process.env.DB_NAME || '', 'postgres', process.env.DB_PASS, {
   host: 'localhost',
   dialect: 'postgres',
 });

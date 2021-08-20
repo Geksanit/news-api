@@ -27,6 +27,9 @@ export const makeRouter = (sequelize: Sequelize) => {
         const instance = await UserModel.findOne({
           where: { id },
         });
+        if (!instance) {
+          return res.status(401).send();
+        }
         const tokenCounter = instance.tokenCounter + 1;
         await UserModel.update({ tokenCounter }, { where: { id } });
         const token = getToken({ userId: id, counter: tokenCounter });

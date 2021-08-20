@@ -41,6 +41,9 @@ export const initializeAuth = (app: core.Express, sequelize: Sequelize) => {
           const user = await UserModel.findOne({
             where: { id: payload.userId },
           });
+          if (!user) {
+            return done(new Error('user not found'));
+          }
           if (user.tokenCounter !== payload.counter) {
             return done(new Error('jwt expired'));
           }

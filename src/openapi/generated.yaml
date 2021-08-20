@@ -616,6 +616,31 @@ paths:
           schema:
             type: string
             format: date
+        - in: query
+          name: searchText
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: order
+          required: false
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  by:
+                    type: string
+                    enum:
+                      - date
+                      - author
+                      - category
+                      - photoCount
+                  direction:
+                    type: string
+                    enum:
+                      - asc
+                      - desc
       responses:
         '200':
           description: A list of news.

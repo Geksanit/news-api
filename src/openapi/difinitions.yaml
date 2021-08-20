@@ -304,4 +304,14 @@ components:
       required:
         - limit
         - offset
+
+    NewsOrder:
+      type: object
+      properties:
+        by:
+          type: string
+          enum: [date, author, category, photoCount]
+        direction:
+          type: string
+          enum: [asc, desc]
         

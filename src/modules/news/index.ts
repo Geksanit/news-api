@@ -10,15 +10,16 @@ import {
   newsAttributes,
 } from '../../models/news';
 import { authenticateAdmin, authenticateUser } from '../../middlewares/authenticate';
-import { CreateNews, News, Pagination, UserView } from '../../types/generated';
+import { CreateNews, News, NewsOrder, Pagination, UserView } from '../../types/generated';
 import { createAuthorModel } from '../../models/author';
 import {
   authorToJSON,
   categoryToJSON,
   CreatedAtFilter,
   Filters,
-  getAuthorFilter,
   getCreatedAtFilter,
+  getOrder,
+  getSearchTextFilter,
   getTagFilter,
   TagFilter,
   tagsToJSON,
@@ -69,13 +70,21 @@ export const makeRouter = (sequelize: Sequelize) => {
   router.get('/', async (req, res, next) => {
     try {
       const { limit, offset } = (req.query as unknown) as Pagination;
-      const { categoryId, title, content, authorName } = (req.query as unknown) as Filters;
+      const {
+        categoryId,
+        title,
+        content,
+        authorName,
+        searchText,
+      } = (req.query as unknown) as Filters;
+      const order = getOrder(((req.query as unknown) as { order: NewsOrder }).order);
 
       const filters = [
         'true', // for empty all filters
         getTagFilter((req.query as unknown) as TagFilter),
         getCreatedAtFilter((req.query as unknown) as CreatedAtFilter),
-        getAuthorFilter(authorName),
+        getSearchTextFilter(searchText),
+        authorName ? `'${authorName}' = u."firstName"` : null,
         categoryId ? `${categoryId} = n."categoryId"` : null,
         title ? `n.title LIKE '%${title}%'` : null,
         content ? `n.content LIKE '%${content}%'` : null,
@@ -85,11 +94,15 @@ export const makeRouter = (sequelize: Sequelize) => {
 
       const fullNews = await sequelize.query(
         `
-          SELECT n.id, (${authorToJSON}) as author, (${categoryToJSON}) as category, ARRAY(${tagsToJSON}) as tags,
+          SELECT n.id, (${authorToJSON}) as author, ARRAY(${categoryToJSON}) as category, ARRAY(${tagsToJSON}) as tags,
             n."createdAt", n.title, n.content, n."topPhotoLink", n."photoLinks", n."isDraft"
           FROM "News" as n
+          JOIN "Authors" as a ON a.id = n."authorId"
+          JOIN "Users" as u ON a.id = u.id
+          JOIN "Categories" as c ON c.id = n."categoryId"
+          JOIN "Tags" as t ON t.id = ANY (n."tagsIds")
           WHERE ${filters}
-          ORDER BY n.id DESC
+          ORDER ${order}
           LIMIT ${limit}
           OFFSET ${offset}
           `,
@@ -108,6 +121,9 @@ export const makeRouter = (sequelize: Sequelize) => {
       const news = await NewsModel.findOne({
         attributes: newsAttributes,
       });
+      if (!news) {
+        return res.status(404).send();
+      }
       res.json(getNewsFromInstance(news));
     } catch (error) {
       next(error);
