@@ -50,14 +50,18 @@ export const getSearchTextFilter = (text: string | undefined) =>
       n.content LIKE '%${text}%' OR
       '${text}' = u."firstName" OR
       '${text}' = c.label OR
-      '${text}' = t.label
+      '${text}' = ANY(ARRAY(
+        SELECT t.label
+        FROM "Tags" as t
+        WHERE t.id = ANY(n."tagsIds")
+      ))
     )`
     : null;
 
 export const tagsToJSON = `
   SELECT json_build_object('id', t.id, 'label', t.label) as tag
   FROM "Tags" as t
-  WHERE t.id = ANY (n."tagsIds")
+  WHERE t.id = ANY(n."tagsIds")
 `;
 
 // old, not recursive query

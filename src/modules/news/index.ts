@@ -80,7 +80,7 @@ export const makeRouter = (sequelize: Sequelize) => {
       const order = getOrder(((req.query as unknown) as { order: NewsOrder }).order);
 
       const filters = [
-        'true', // for empty all filters
+        'n."isDraft" = false',
         getTagFilter((req.query as unknown) as TagFilter),
         getCreatedAtFilter((req.query as unknown) as CreatedAtFilter),
         getSearchTextFilter(searchText),
@@ -100,7 +100,6 @@ export const makeRouter = (sequelize: Sequelize) => {
           JOIN "Authors" as a ON a.id = n."authorId"
           JOIN "Users" as u ON a.id = u.id
           JOIN "Categories" as c ON c.id = n."categoryId"
-          JOIN "Tags" as t ON t.id = ANY (n."tagsIds")
           WHERE ${filters}
           ORDER ${order}
           LIMIT ${limit}
