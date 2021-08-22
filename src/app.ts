@@ -1,5 +1,4 @@
 /* eslint-disable import/first */
-import dotenv from 'dotenv';
 import express from 'express';
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
@@ -8,8 +7,6 @@ import swaggerUi from 'swagger-ui-express';
 import yaml from 'yamljs';
 import path from 'path';
 import * as OpenApiValidator from 'express-openapi-validator';
-
-dotenv.config();
 
 import * as categories from './modules/categories';
 import * as users from './modules/users';
@@ -20,18 +17,15 @@ import * as tags from './modules/tags';
 import { log } from './libs/log';
 import { errorHandler } from './middlewares/errorHandler';
 import { initializeAuth } from './auth';
+import { getConfig } from './config';
 
 const apiSpec = path.resolve(__dirname, './openapi/generated.yaml');
 const swaggerDocument = yaml.load(apiSpec);
-if (!process.env.DB_NAME) {
-  throw new Error('no DB_NAME');
-}
-const sequelize = new Sequelize(process.env.DB_NAME || '', 'postgres', process.env.DB_PASS, {
+const config = getConfig();
+const sequelize = new Sequelize(config.DB_NAME, 'postgres', config.DB_PASS, {
   host: 'localhost',
   dialect: 'postgres',
 });
-const hostname = '127.0.0.1';
-const port = 3000;
 const app = express();
 
 app.use(bodyParser.json());
@@ -63,7 +57,7 @@ app.use('/authors', authors.makeRouter(sequelize));
 
 app.use(errorHandler);
 
-app.listen(port, hostname, () => {
-  log.info(`Server running at http://${hostname}:${port}/`);
-  log.info(`Swagger running at http://${hostname}:${port}/api-docs`);
+app.listen(config.PORT, config.HOST, () => {
+  log.info(`Server running at http://${config.HOST}:${config.PORT}/`);
+  log.info(`Swagger running at http://${config.HOST}:${config.PORT}/api-docs`);
 });

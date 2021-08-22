@@ -1,5 +1,6 @@
 import bcrypt from 'bcrypt';
 
-import { HASH_SALT } from '../constants';
+import { getConfig } from '../config';
 
-export const getHash = (password: string) => bcrypt.hashSync(password, HASH_SALT);
+const config = getConfig();
+export const getHash = (password: string) => bcrypt.hashSync(password, config.HASH_SALT);

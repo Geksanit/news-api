@@ -1,9 +1,5 @@
 /* eslint-disable no-console */
-/* eslint-disable import/first */
-import dotenv from 'dotenv';
 import { Sequelize } from 'sequelize';
-
-dotenv.config();
 
 import { createCategoryModel } from '../src/models/category';
 import { createUserModel } from '../src/models/user';
@@ -11,10 +7,12 @@ import { createAuthorModel } from '../src/models/author';
 import { createNewsModel } from '../src/models/news';
 import { createCommentModel } from '../src/models/comments';
 import { createTagModel } from '../src/models/tags';
+import { getConfig } from '../src/config';
 
 const script = async () => {
   console.log('db sync models script started');
-  const sequelize = new Sequelize(process.env.DB_NAME, 'postgres', process.env.DB_PASS, {
+  const config = getConfig();
+  const sequelize = new Sequelize(config.DB_NAME, 'postgres', config.DB_PASS, {
     host: 'localhost',
     dialect: 'postgres',
   });

@@ -11,4 +11,8 @@
         "outDir": "dist",
         "baseUrl": ".",
     },
+    "exclude": [
+		"node_modules",
+        "dist"
+    ]
   }

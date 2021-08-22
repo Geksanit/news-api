@@ -1,9 +1,5 @@
 /* eslint-disable no-console */
-/* eslint-disable import/first */
-import dotenv from 'dotenv';
 import { Sequelize } from 'sequelize';
-
-dotenv.config();
 
 import { initCategoryData } from '../src/models/category';
 import { initUserData } from '../src/models/user';
@@ -11,10 +7,12 @@ import { initAuthorData } from '../src/models/author';
 import { initCommentData } from '../src/models/comments';
 import { initNewsData } from '../src/models/news';
 import { initTagData } from '../src/models/tags';
+import { getConfig } from '../src/config';
 
 const script = async () => {
   console.log('db initial data started');
-  const sequelize = new Sequelize(process.env.DB_NAME, 'postgres', process.env.DB_PASS, {
+  const config = getConfig();
+  const sequelize = new Sequelize(config.DB_NAME, 'postgres', config.DB_PASS, {
     host: 'localhost',
     dialect: 'postgres',
   });
