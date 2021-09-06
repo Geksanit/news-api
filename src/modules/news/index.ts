@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 import express from 'express';
 import { Sequelize, QueryTypes } from 'sequelize';
 
@@ -24,9 +25,6 @@ import {
   TagFilter,
   tagsToJSON,
 } from './model';
-
-// const t: null | number = null;
-// export const tt: number = t; // FTW?
 
 export const makeRouter = (sequelize: Sequelize) => {
   const NewsModel = createNewsModel(sequelize);
@@ -77,21 +75,26 @@ export const makeRouter = (sequelize: Sequelize) => {
         authorName,
         searchText,
       } = (req.query as unknown) as Filters;
-      const order = getOrder(((req.query as unknown) as { order: NewsOrder }).order);
-
-      const filters = [
+      const { tag, tags__in, tags__all } = (req.query as unknown) as TagFilter;
+      const {
+        created_at,
+        created_at__lt,
+        created_at__gt,
+      } = (req.query as unknown) as CreatedAtFilter;
+      const { order } = (req.query as unknown) as { order: NewsOrder };
+      const stringifiedOrder = getOrder(order);
+      const stringifiedFilters = [
         'n."isDraft" = false',
-        getTagFilter((req.query as unknown) as TagFilter),
-        getCreatedAtFilter((req.query as unknown) as CreatedAtFilter),
+        getTagFilter({ tag, tags__in, tags__all }),
+        getCreatedAtFilter({ created_at, created_at__lt, created_at__gt }),
         getSearchTextFilter(searchText),
-        authorName ? `'${authorName}' = u."firstName"` : null,
-        categoryId ? `${categoryId} = n."categoryId"` : null,
-        title ? `n.title LIKE '%${title}%'` : null,
-        content ? `n.content LIKE '%${content}%'` : null,
+        authorName ? `:authorName = u."firstName"` : null,
+        categoryId ? `:categoryId = n."categoryId"` : null,
+        title ? `n.title LIKE :title` : null,
+        content ? `n.content LIKE :content` : null,
       ]
         .filter(f => f !== null)
         .join(' AND ');
-
       const fullNews = await sequelize.query(
         `
           SELECT n.id, (${authorToJSON}) as author, ARRAY(${categoryToJSON}) as category, ARRAY(${tagsToJSON}) as tags,
@@ -100,12 +103,28 @@ export const makeRouter = (sequelize: Sequelize) => {
           JOIN "Authors" as a ON a.id = n."authorId"
           JOIN "Users" as u ON a.id = u.id
           JOIN "Categories" as c ON c.id = n."categoryId"
-          WHERE ${filters}
-          ORDER ${order}
-          LIMIT ${limit}
-          OFFSET ${offset}
+          WHERE ${stringifiedFilters}
+          ORDER ${stringifiedOrder}
+          LIMIT :limit
+          OFFSET :offset
           `,
         {
+          replacements: {
+            limit,
+            offset,
+            authorName,
+            categoryId,
+            title: `%${title}%`,
+            content: `%${content}%`,
+            tag,
+            tags__in,
+            tags__all,
+            created_at,
+            created_at__lt,
+            created_at__gt,
+            searchText,
+            searchTextLike: `%${searchText}%`,
+          },
           nest: true,
           type: QueryTypes.SELECT,
         },
