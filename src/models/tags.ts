@@ -1,6 +1,8 @@
 import { Sequelize, Model, DataTypes } from 'sequelize';
 import { Tag, CreateTag } from 'src/types/generated';
 
+import { ModelsStore } from './models.store';
+
 interface TagInstance extends Model<Tag, CreateTag>, Tag {}
 
 export const createTagModel = (sequalize: Sequelize) =>
@@ -54,8 +56,7 @@ export const initialTags: CreateTag[] = [
   },
 ];
 
-export const initTagData = async (sequelize: Sequelize) => {
-  const TagModel = createTagModel(sequelize);
+export const initTagData = async (sequelize: Sequelize, { TagModel }: ModelsStore) => {
   // await TagModel.drop();
   await TagModel.sync({ force: true });
   const promises = initialTags.map(async data => {

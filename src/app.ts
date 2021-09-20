@@ -18,6 +18,7 @@ import { log } from './libs/log';
 import { errorHandler } from './middlewares/errorHandler';
 import { initializeAuth } from './auth';
 import { getConfig } from './config';
+import { createModelsStore } from './models/models.store';
 
 const apiSpec = path.resolve(__dirname, './openapi/generated.yaml');
 const swaggerDocument = yaml.load(apiSpec);
@@ -47,13 +48,14 @@ app.use(
 );
 
 initializeAuth(app, sequelize);
+const modelsStore = createModelsStore(sequelize);
 
-app.use('/posts', news.makeRouter(sequelize));
-app.use('/comments', comments.makeRouter(sequelize));
-app.use('/tags', tags.makeRouter(sequelize));
-app.use('/categories', categories.makeRouter(sequelize));
-app.use('/users', users.makeRouter(sequelize));
-app.use('/authors', authors.makeRouter(sequelize));
+app.use('/posts', news.makeRouter(sequelize, modelsStore));
+app.use('/comments', comments.makeRouter(modelsStore));
+app.use('/tags', tags.makeRouter(modelsStore));
+app.use('/categories', categories.makeRouter(modelsStore));
+app.use('/users', users.makeRouter(modelsStore));
+app.use('/authors', authors.makeRouter(modelsStore));
 
 app.use(errorHandler);
 

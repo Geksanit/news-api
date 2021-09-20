@@ -1,14 +1,13 @@
 import express from 'express';
-import { Sequelize } from 'sequelize/types';
 
 import { HttpError } from '../../utils/Errors';
 import { createLogger } from '../../middlewares/logger';
-import { createTagModel, getTagFromInstance } from '../../models/tags';
+import { getTagFromInstance } from '../../models/tags';
 import { authenticateAdmin } from '../../middlewares/authenticate';
 import { Pagination } from '../../types/generated';
+import { ModelsStore } from '../../models/models.store';
 
-export const makeRouter = (sequelize: Sequelize) => {
-  const TagModel = createTagModel(sequelize);
+export const makeRouter = ({ TagModel }: ModelsStore) => {
   const router = express.Router();
   router.use(createLogger(module));
 

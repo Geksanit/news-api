@@ -8,6 +8,7 @@ import { initCommentData } from '../src/models/comments';
 import { initNewsData } from '../src/models/news';
 import { initTagData } from '../src/models/tags';
 import { getConfig } from '../src/config';
+import { createModelsStore } from '../src/models/models.store';
 
 const script = async () => {
   console.log('db initial data started');
@@ -24,12 +25,13 @@ const script = async () => {
     return;
   }
   try {
+    const store = createModelsStore(sequelize);
     const userTask = async (seq: Sequelize) => {
-      await initUserData(seq, true);
-      await initAuthorData(seq);
+      await initUserData(seq, store, true);
+      await initAuthorData(seq, store);
     };
     const tasks = [initCategoryData, userTask, initTagData, initCommentData, initNewsData];
-    const promises: Promise<any>[] = tasks.map(task => task(sequelize, true));
+    const promises: Promise<any>[] = tasks.map(task => task(sequelize, store, true));
     await Promise.all(promises);
 
     console.log('script completed');

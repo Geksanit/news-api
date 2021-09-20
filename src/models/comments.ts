@@ -2,6 +2,8 @@ import { pick } from 'ramda';
 import { Sequelize, Model, DataTypes } from 'sequelize';
 import { Comment, CreateComment } from 'src/types/generated';
 
+import { ModelsStore } from './models.store';
+
 interface CommentInstance extends Model<Comment, CreateComment & { userId: number }>, Comment {}
 
 export const createCommentModel = (sequalize: Sequelize) =>
@@ -42,8 +44,7 @@ export const initialCategories: Array<CreateComment & { userId: number }> = [
   },
 ];
 
-export const initCommentData = async (sequelize: Sequelize) => {
-  const CommentModel = createCommentModel(sequelize);
+export const initCommentData = async (sequelize: Sequelize, { CommentModel }: ModelsStore) => {
   // await CommentModel.drop();
   await CommentModel.sync({ force: true });
   const promises = initialCategories.map(async data => {

@@ -3,6 +3,7 @@ import { UserModel, UserView, CreateUser } from 'src/types/generated';
 import * as R from 'ramda';
 
 import { getHash } from '../libs/passwordHash';
+import { ModelsStore } from './models.store';
 
 interface UserCreationAttributes extends Optional<UserModel, 'id'> {}
 
@@ -85,15 +86,17 @@ export const initialCategories: Array<CreateUser & { isAdmin: boolean }> = [
   },
 ];
 
-export const initUserData = async (sequelize: Sequelize, isDropTable: boolean) => {
-  const model = createUserModel(sequelize);
+export const initUserData = async (
+  sequelize: Sequelize,
+  { UserModel: UModel }: ModelsStore,
+  isDropTable: boolean,
+) => {
   if (isDropTable) {
-    await model.drop();
+    await UModel.drop();
   }
-  await model.sync({ force: true });
+  await UModel.sync({ force: true });
   const promises = initialCategories.map(async data => {
-    const userModel = createUserToModel(data);
-    await model.create({ ...userModel, isAdmin: data.isAdmin });
+    await UModel.create({ ...createUserToModel(data), isAdmin: data.isAdmin });
   });
   return Promise.all(promises);
 };

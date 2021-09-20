@@ -1,16 +1,14 @@
 import express from 'express';
-import { Sequelize } from 'sequelize/types';
 
 import { HttpError } from '../../utils/Errors';
 import { createLogger } from '../../middlewares/logger';
-import { createCommentModel, getCommentFromInstance } from '../../models/comments';
+import { getCommentFromInstance } from '../../models/comments';
 import { authenticateAdmin, authenticateUser } from '../../middlewares/authenticate';
-import { createNewsModel } from '../../models/news';
 import { CreateComment, UserView, Comment, Pagination } from '../../types/generated';
+import { ModelsStore } from '../../models/models.store';
 
-export const makeRouter = (sequelize: Sequelize) => {
-  const CommentModel = createCommentModel(sequelize);
-  const NewsModel = createNewsModel(sequelize);
+export const makeRouter = (modelsStore: ModelsStore) => {
+  const { NewsModel, CommentModel } = modelsStore;
   const router = express.Router();
   router.use(createLogger(module));
 

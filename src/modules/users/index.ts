@@ -1,21 +1,15 @@
 import express from 'express';
-import { Sequelize } from 'sequelize/types';
 import passport from 'passport';
 
 import { HttpError } from '../../utils/Errors';
 import { createLogger } from '../../middlewares/logger';
-import {
-  createUserModel,
-  createUserToModel,
-  getUserViewFromInstance,
-  userViewAttributes,
-} from '../../models/user';
+import { createUserToModel, getUserViewFromInstance, userViewAttributes } from '../../models/user';
 import { getToken } from '../../libs/token';
 import { authenticateAdmin, authenticateUser } from '../../middlewares/authenticate';
 import { Pagination } from '../../types/generated';
+import { ModelsStore } from '../../models/models.store';
 
-export const makeRouter = (sequelize: Sequelize) => {
-  const UserModel = createUserModel(sequelize);
+export const makeRouter = ({ UserModel }: ModelsStore) => {
   const router = express.Router();
   router.use(createLogger(module));
 

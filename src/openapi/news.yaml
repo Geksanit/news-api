@@ -108,50 +108,6 @@ paths:
                   $ref: "difinitions.yaml#/components/schemas/FullNews"
         500:
           description: Unexpected Error
-    post:
-      tags:
-        - News
-      summary: Add a new News
-      security:
-        - cookieAuth: []
-      requestBody:
-        description: News create request
-        content:
-          application/json:
-            schema:
-              $ref: "difinitions.yaml#/components/schemas/CreateNews"
-        required: true
-      responses:
-        201:
-          description: Successful operation
-          content:
-            application/json:
-              schema:
-                $ref: "difinitions.yaml#/components/schemas/News"
-        400:
-          description: Invalid request provided
-        500:
-          description: Unexpected Error
-    patch:
-      tags:
-        - News
-      summary: Update News
-      security:
-        - cookieAuth: []
-      requestBody:
-        description: News update request
-        content:
-          application/json:
-            schema:
-              $ref: "difinitions.yaml#/components/schemas/News"
-        required: true
-      responses:
-        200:
-          description: Successful operation
-        400:
-          description: Invalid request provided
-        500:
-          description: Unexpected Error
 
   /posts/{id}:
     get:
@@ -174,26 +130,7 @@ paths:
                $ref: "difinitions.yaml#/components/schemas/FullNews"
         500:
           description: Unexpected Error
-    delete:
-      security:
-        - cookieAuth: []
-      tags:
-        - News
-      summary: Delete News (available only for admins)
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema: 
-            type: integer
-          description: News delete request
-      responses:
-        200:
-          description: Successful operation
-        400:
-          description: Invalid request provided
-        500:
-          description: Unexpected Error
+
   /posts/raw/:
     get:
       tags:
@@ -227,7 +164,7 @@ paths:
                   $ref: "difinitions.yaml#/components/schemas/News"
         500:
           description: Unexpected Error
-  /posts/my-drafts/:
+  /posts/drafts/:
     get:
       tags:
         - News
@@ -258,5 +195,72 @@ paths:
                 type: array
                 items:
                   $ref: "difinitions.yaml#/components/schemas/News"
+        500:
+          description: Unexpected Error
+
+    post:
+      tags:
+        - News
+      summary: Add a new News
+      security:
+        - cookieAuth: []
+      requestBody:
+        description: News create request
+        content:
+          application/json:
+            schema:
+              $ref: "difinitions.yaml#/components/schemas/CreateNews"
+        required: true
+      responses:
+        201:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "difinitions.yaml#/components/schemas/News"
+        400:
+          description: Invalid request provided
+        500:
+          description: Unexpected Error
+
+    patch:
+      tags:
+        - News
+      summary: Update News
+      security:
+        - cookieAuth: []
+      requestBody:
+        description: News update request
+        content:
+          application/json:
+            schema:
+              $ref: "difinitions.yaml#/components/schemas/News"
+        required: true
+      responses:
+        200:
+          description: Successful operation
+        400:
+          description: Invalid request provided
+        500:
+          description: Unexpected Error
+
+    delete:
+      security:
+        - cookieAuth: []
+      tags:
+        - News
+      summary: Delete News (available only for admins)
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: 
+            type: integer
+          description: News delete request
+      responses:
+        200:
+          description: Successful operation
+        400:
+          description: Invalid request provided
         500:
           description: Unexpected Error

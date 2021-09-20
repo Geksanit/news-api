@@ -20,8 +20,8 @@ paths:
     $ref: 'news.yaml#/paths/~1posts~1raw~1'
   /posts/:
     $ref: 'news.yaml#/paths/~1posts~1'
-  /posts/my-drafts/:
-    $ref: 'news.yaml#/paths/~1posts~1my-drafts~1'
+  /posts/drafts/:
+    $ref: 'news.yaml#/paths/~1posts~1drafts~1'
   /posts/{id}:
     $ref: 'news.yaml#/paths/~1posts~1{id}'
   /comments/:

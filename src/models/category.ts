@@ -1,7 +1,9 @@
 import { Sequelize, Model, DataTypes } from 'sequelize';
 import { Category, CreateCategory } from 'src/types/generated';
 
-interface CategoryInstance extends Model<Category, CreateCategory>, Category {}
+import { ModelsStore } from './models.store';
+
+export interface CategoryInstance extends Model<Category, CreateCategory>, Category {}
 
 export const createCategoryModel = (sequalize: Sequelize) =>
   sequalize.define<CategoryInstance>('Category', {
@@ -65,8 +67,7 @@ export const initialCategories: CreateCategory[] = [
   },
 ];
 
-export const initCategoryData = async (sequelize: Sequelize) => {
-  const CategoryModel = createCategoryModel(sequelize);
+export const initCategoryData = async (sequelize: Sequelize, { CategoryModel }: ModelsStore) => {
   // await CategoryModel.drop();
   await CategoryModel.sync({ force: true });
   const promises = initialCategories.map(async data => {

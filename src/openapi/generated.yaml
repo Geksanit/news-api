@@ -544,8 +544,6 @@ paths:
                           maxItems: 10
                           items:
                             type: string
-                        isDraft:
-                          type: boolean
                       required:
                         - title
                         - categoryId
@@ -553,7 +551,6 @@ paths:
                         - content
                         - topPhotoLink
                         - photoLinks
-                        - isDraft
                     - type: object
                       properties:
                         id:
@@ -773,8 +770,6 @@ paths:
                       maxItems: 10
                       items:
                         type: string
-                    isDraft:
-                      type: boolean
                   required:
                     - title
                     - createdAt
@@ -784,185 +779,9 @@ paths:
                     - content
                     - topPhotoLink
                     - photoLinks
-                    - isDraft
         '500':
           description: Unexpected Error
-    post:
-      tags:
-        - News
-      summary: Add a new News
-      security:
-        - cookieAuth: []
-      requestBody:
-        description: News create request
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                title:
-                  type: string
-                categoryId:
-                  type: number
-                tagsIds:
-                  type: array
-                  uniqueItems: true
-                  minItems: 1
-                  maxItems: 10
-                  items:
-                    type: number
-                content:
-                  type: string
-                topPhotoLink:
-                  type: string
-                photoLinks:
-                  type: array
-                  uniqueItems: true
-                  minItems: 0
-                  maxItems: 10
-                  items:
-                    type: string
-                isDraft:
-                  type: boolean
-              required:
-                - title
-                - categoryId
-                - tagsIds
-                - content
-                - topPhotoLink
-                - photoLinks
-                - isDraft
-        required: true
-      responses:
-        '201':
-          description: Successful operation
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - type: object
-                    properties:
-                      title:
-                        type: string
-                      categoryId:
-                        type: number
-                      tagsIds:
-                        type: array
-                        uniqueItems: true
-                        minItems: 1
-                        maxItems: 10
-                        items:
-                          type: number
-                      content:
-                        type: string
-                      topPhotoLink:
-                        type: string
-                      photoLinks:
-                        type: array
-                        uniqueItems: true
-                        minItems: 0
-                        maxItems: 10
-                        items:
-                          type: string
-                      isDraft:
-                        type: boolean
-                    required:
-                      - title
-                      - categoryId
-                      - tagsIds
-                      - content
-                      - topPhotoLink
-                      - photoLinks
-                      - isDraft
-                  - type: object
-                    properties:
-                      id:
-                        type: integer
-                      createdAt:
-                        type: string
-                        format: date
-                        description: Creation date
-                        example: '2021-01-30'
-                      authorId:
-                        type: number
-                    required:
-                      - id
-                      - createdAt
-                      - authorId
-        '400':
-          description: Invalid request provided
-        '500':
-          description: Unexpected Error
-    patch:
-      tags:
-        - News
-      summary: Update News
-      security:
-        - cookieAuth: []
-      requestBody:
-        description: News update request
-        content:
-          application/json:
-            schema:
-              allOf:
-                - type: object
-                  properties:
-                    title:
-                      type: string
-                    categoryId:
-                      type: number
-                    tagsIds:
-                      type: array
-                      uniqueItems: true
-                      minItems: 1
-                      maxItems: 10
-                      items:
-                        type: number
-                    content:
-                      type: string
-                    topPhotoLink:
-                      type: string
-                    photoLinks:
-                      type: array
-                      uniqueItems: true
-                      minItems: 0
-                      maxItems: 10
-                      items:
-                        type: string
-                    isDraft:
-                      type: boolean
-                  required:
-                    - title
-                    - categoryId
-                    - tagsIds
-                    - content
-                    - topPhotoLink
-                    - photoLinks
-                    - isDraft
-                - type: object
-                  properties:
-                    id:
-                      type: integer
-                    createdAt:
-                      type: string
-                      format: date
-                      description: Creation date
-                      example: '2021-01-30'
-                    authorId:
-                      type: number
-                  required:
-                    - id
-                    - createdAt
-                    - authorId
-        required: true
-      responses:
-        '200':
-          description: Successful operation
-        '400':
-          description: Invalid request provided
-        '500':
-          description: Unexpected Error
-  /posts/my-drafts/:
+  /posts/drafts/:
     get:
       tags:
         - News
@@ -1019,8 +838,6 @@ paths:
                           maxItems: 10
                           items:
                             type: string
-                        isDraft:
-                          type: boolean
                       required:
                         - title
                         - categoryId
@@ -1028,7 +845,6 @@ paths:
                         - content
                         - topPhotoLink
                         - photoLinks
-                        - isDraft
                     - type: object
                       properties:
                         id:
@@ -1044,6 +860,192 @@ paths:
                         - id
                         - createdAt
                         - authorId
+        '500':
+          description: Unexpected Error
+    post:
+      tags:
+        - News
+      summary: Add a new News
+      security:
+        - cookieAuth: []
+      requestBody:
+        description: News create request
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                categoryId:
+                  type: number
+                tagsIds:
+                  type: array
+                  uniqueItems: true
+                  minItems: 1
+                  maxItems: 10
+                  items:
+                    type: number
+                content:
+                  type: string
+                topPhotoLink:
+                  type: string
+                photoLinks:
+                  type: array
+                  uniqueItems: true
+                  minItems: 0
+                  maxItems: 10
+                  items:
+                    type: string
+              required:
+                - title
+                - categoryId
+                - tagsIds
+                - content
+                - topPhotoLink
+                - photoLinks
+        required: true
+      responses:
+        '201':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - type: object
+                    properties:
+                      title:
+                        type: string
+                      categoryId:
+                        type: number
+                      tagsIds:
+                        type: array
+                        uniqueItems: true
+                        minItems: 1
+                        maxItems: 10
+                        items:
+                          type: number
+                      content:
+                        type: string
+                      topPhotoLink:
+                        type: string
+                      photoLinks:
+                        type: array
+                        uniqueItems: true
+                        minItems: 0
+                        maxItems: 10
+                        items:
+                          type: string
+                    required:
+                      - title
+                      - categoryId
+                      - tagsIds
+                      - content
+                      - topPhotoLink
+                      - photoLinks
+                  - type: object
+                    properties:
+                      id:
+                        type: integer
+                      createdAt:
+                        type: string
+                        format: date
+                        description: Creation date
+                        example: '2021-01-30'
+                      authorId:
+                        type: number
+                    required:
+                      - id
+                      - createdAt
+                      - authorId
+        '400':
+          description: Invalid request provided
+        '500':
+          description: Unexpected Error
+    patch:
+      tags:
+        - News
+      summary: Update News
+      security:
+        - cookieAuth: []
+      requestBody:
+        description: News update request
+        content:
+          application/json:
+            schema:
+              allOf:
+                - type: object
+                  properties:
+                    title:
+                      type: string
+                    categoryId:
+                      type: number
+                    tagsIds:
+                      type: array
+                      uniqueItems: true
+                      minItems: 1
+                      maxItems: 10
+                      items:
+                        type: number
+                    content:
+                      type: string
+                    topPhotoLink:
+                      type: string
+                    photoLinks:
+                      type: array
+                      uniqueItems: true
+                      minItems: 0
+                      maxItems: 10
+                      items:
+                        type: string
+                  required:
+                    - title
+                    - categoryId
+                    - tagsIds
+                    - content
+                    - topPhotoLink
+                    - photoLinks
+                - type: object
+                  properties:
+                    id:
+                      type: integer
+                    createdAt:
+                      type: string
+                      format: date
+                      description: Creation date
+                      example: '2021-01-30'
+                    authorId:
+                      type: number
+                  required:
+                    - id
+                    - createdAt
+                    - authorId
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+        '400':
+          description: Invalid request provided
+        '500':
+          description: Unexpected Error
+    delete:
+      security:
+        - cookieAuth: []
+      tags:
+        - News
+      summary: Delete News (available only for admins)
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: News delete request
+      responses:
+        '200':
+          description: Successful operation
+        '400':
+          description: Invalid request provided
         '500':
           description: Unexpected Error
   '/posts/{id}':
@@ -1154,8 +1156,6 @@ paths:
                     maxItems: 10
                     items:
                       type: string
-                  isDraft:
-                    type: boolean
                 required:
                   - title
                   - createdAt
@@ -1165,27 +1165,6 @@ paths:
                   - content
                   - topPhotoLink
                   - photoLinks
-                  - isDraft
-        '500':
-          description: Unexpected Error
-    delete:
-      security:
-        - cookieAuth: []
-      tags:
-        - News
-      summary: Delete News (available only for admins)
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: integer
-          description: News delete request
-      responses:
-        '200':
-          description: Successful operation
-        '400':
-          description: Invalid request provided
         '500':
           description: Unexpected Error
   /comments/:

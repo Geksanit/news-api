@@ -1,14 +1,13 @@
 import express from 'express';
-import { Sequelize } from 'sequelize/types';
 
 import { HttpError } from '../../utils/Errors';
 import { createLogger } from '../../middlewares/logger';
-import { createCategoryModel, getCategoryFromInstance } from '../../models/category';
+import { getCategoryFromInstance } from '../../models/category';
 import { authenticateAdmin } from '../../middlewares/authenticate';
 import { Pagination } from '../../types/generated';
+import { ModelsStore } from '../../models/models.store';
 
-export const makeRouter = (sequelize: Sequelize) => {
-  const CategoryModel = createCategoryModel(sequelize);
+export const makeRouter = ({ CategoryModel }: ModelsStore) => {
   const router = express.Router();
   router.use(createLogger(module));
 

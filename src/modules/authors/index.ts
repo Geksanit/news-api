@@ -1,14 +1,13 @@
 import express from 'express';
-import { Sequelize } from 'sequelize/types';
 
 import { HttpError } from '../../utils/Errors';
 import { createLogger } from '../../middlewares/logger';
-import { createAuthorModel, getAuthorFromInstance, attributes } from '../../models/author';
+import { getAuthorFromInstance, attributes } from '../../models/author';
 import { authenticateAdmin } from '../../middlewares/authenticate';
 import { Pagination } from '../../types/generated';
+import { ModelsStore } from '../../models/models.store';
 
-export const makeRouter = (sequelize: Sequelize) => {
-  const AuthorModel = createAuthorModel(sequelize);
+export const makeRouter = ({ AuthorModel }: ModelsStore) => {
   const router = express.Router();
   router.use(createLogger(module));
 

@@ -2,43 +2,48 @@ import { pick } from 'ramda';
 import { Sequelize, Model, DataTypes } from 'sequelize';
 import { News, CreateNews } from 'src/types/generated';
 
-interface NewsInstance extends Model<News, CreateNews & { authorId: number }>, News {}
+import { ModelsStore } from './models.store';
 
-export const createNewsModel = (sequalize: Sequelize) =>
-  sequalize.define<NewsInstance>('News', {
-    id: {
-      type: DataTypes.INTEGER,
-      autoIncrement: true,
-      primaryKey: true,
-    },
-    title: {
-      type: DataTypes.STRING,
-    },
-    authorId: {
-      type: DataTypes.INTEGER,
-    },
-    categoryId: {
-      type: DataTypes.INTEGER,
-    },
-    tagsIds: {
-      type: DataTypes.ARRAY(DataTypes.INTEGER),
-    },
-    content: {
-      type: DataTypes.TEXT,
-    },
-    topPhotoLink: {
-      type: DataTypes.STRING,
-    },
-    photoLinks: {
-      type: DataTypes.ARRAY(DataTypes.STRING),
-    },
-    isDraft: {
-      type: DataTypes.BOOLEAN,
-    },
-    createdAt: {
-      type: DataTypes.DATE,
-    },
-  });
+export interface NewsInstance extends Model<News, CreateNews & { authorId: number }>, News {}
+export type NewsAttributes = News;
+
+const attributers = {
+  id: {
+    type: DataTypes.INTEGER,
+    autoIncrement: true,
+    primaryKey: true,
+  },
+  title: {
+    type: DataTypes.STRING,
+  },
+  authorId: {
+    type: DataTypes.INTEGER,
+  },
+  categoryId: {
+    type: DataTypes.INTEGER,
+  },
+  tagsIds: {
+    type: DataTypes.ARRAY(DataTypes.INTEGER),
+  },
+  content: {
+    type: DataTypes.TEXT,
+  },
+  topPhotoLink: {
+    type: DataTypes.STRING,
+  },
+  photoLinks: {
+    type: DataTypes.ARRAY(DataTypes.STRING),
+  },
+  createdAt: {
+    type: DataTypes.DATE,
+  },
+};
+
+export const createNewsModel = <Instance extends NewsInstance>(sequalize: Sequelize) =>
+  sequalize.define<Instance, NewsAttributes>('News', attributers);
+
+export const createNewsDraftModel = <Instance extends NewsInstance>(sequalize: Sequelize) =>
+  sequalize.define<Instance, NewsAttributes>('NewsDraft', attributers);
 
 export const newsAttributes: Array<keyof News> = [
   'id',
@@ -50,7 +55,6 @@ export const newsAttributes: Array<keyof News> = [
   'createdAt',
   'topPhotoLink',
   'photoLinks',
-  'isDraft',
 ];
 
 export const getNewsFromInstance = (instance: NewsInstance): News =>
@@ -65,7 +69,27 @@ export const createNewsToModel = ({
   };
 };
 
-export const initialCategories: Array<CreateNews & { authorId: number }> = [
+export const initNewsData = async (
+  seq: Sequelize,
+  { NewsModel, NewsDraftModel }: ModelsStore,
+  isDropTable: boolean,
+) => {
+  if (isDropTable) {
+    await NewsModel.drop();
+    await NewsDraftModel.drop();
+  }
+  await NewsDraftModel.sync({ force: true });
+  await NewsModel.sync({ force: true });
+  const promises = initialData.map(async data => {
+    const draftInstance = await NewsDraftModel.create(createNewsToModel(data));
+    if (data.isPublished) {
+      await draftInstance.createNews(createNewsToModel(data));
+    }
+  });
+  return Promise.all(promises);
+};
+
+export const initialData: Array<CreateNews & { authorId: number; isPublished: boolean }> = [
   {
     title: 'Truck carrying tomato puree crashes, turning road red',
     categoryId: 1,
@@ -78,7 +102,7 @@ export const initialCategories: Array<CreateNews & { authorId: number }> = [
     topPhotoLink:
       'https://cdn.cnn.com/cnnnext/dam/assets/210603052531-restricted-england-crash-tomato-puree-0602-exlarge-169.jpg',
     photoLinks: ['photo1'],
-    isDraft: false,
+    isPublished: true,
     authorId: 1,
   },
   {
@@ -90,7 +114,7 @@ export const initialCategories: Array<CreateNews & { authorId: number }> = [
     topPhotoLink:
       'https://cdn.cnn.com/cnnnext/dam/assets/210602221801-05-new-zealand-xinjiang-china-intl-hnk-exlarge-169.jpg',
     photoLinks: ['photo1', 'photo2', 'photo3'],
-    isDraft: false,
+    isPublished: true,
     authorId: 2,
   },
   {
@@ -100,8 +124,8 @@ export const initialCategories: Array<CreateNews & { authorId: number }> = [
     content: `bla bla bla`,
     topPhotoLink: 'https://google.com/xaxaxa.jpg',
     photoLinks: ['photo1', 'photo2', 'photo3', 'photo4', 'photo5'],
-    isDraft: true,
     authorId: 1,
+    isPublished: true,
   },
   {
     title: 'Lorem Ipsum',
@@ -110,8 +134,8 @@ export const initialCategories: Array<CreateNews & { authorId: number }> = [
     content: `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut facilisis risus feugiat, feugiat augue et, euismod libero. Duis eget arcu iaculis, commodo sem quis, faucibus lacus. Nulla sollicitudin nulla vel finibus semper. Vestibulum placerat velit urna, ac egestas massa posuere sed. Vestibulum eu quam est. Proin magna quam, ultricies sed neque volutpat, dapibus cursus leo. Vestibulum lectus ipsum, euismod eu quam vitae, scelerisque laoreet nibh. Maecenas erat justo, consectetur ut euismod eu, pretium id turpis.`,
     topPhotoLink: '',
     photoLinks: [],
-    isDraft: true,
     authorId: 2,
+    isPublished: false,
   },
   {
     title:
@@ -121,8 +145,8 @@ export const initialCategories: Array<CreateNews & { authorId: number }> = [
     content: `Donec commodo quis augue vel maximus. Maecenas nunc elit, porttitor a nunc sit amet, sollicitudin tincidunt nisl. Nullam gravida felis in suscipit faucibus. Duis elementum ipsum et molestie gravida. Morbi aliquam justo nec sagittis volutpat. Donec et condimentum diam. Quisque pellentesque felis vitae elit laoreet, varius vestibulum purus dignissim.`,
     topPhotoLink: '',
     photoLinks: ['photo1', 'photo2'],
-    isDraft: false,
     authorId: 1,
+    isPublished: true,
   },
   {
     title: `Azerbaijan Grand Prix: Sergio Perez wins after Max Verstappen high speed crash`,
@@ -132,8 +156,8 @@ export const initialCategories: Array<CreateNews & { authorId: number }> = [
     topPhotoLink:
       'https://ichef.bbci.co.uk/onesport/cps/800/cpsprodpb/765E/production/_118820303_baku.jpg',
     photoLinks: [''],
-    isDraft: false,
     authorId: 1,
+    isPublished: true,
   },
   {
     title:
@@ -144,8 +168,8 @@ export const initialCategories: Array<CreateNews & { authorId: number }> = [
     topPhotoLink:
       'https://ichef.bbci.co.uk/onesport/cps/800/cpsprodpb/11762/production/_118822517_hi067868737.jpg',
     photoLinks: [''],
-    isDraft: false,
     authorId: 1,
+    isPublished: true,
   },
 
   {
@@ -155,8 +179,8 @@ export const initialCategories: Array<CreateNews & { authorId: number }> = [
     content: `Integer quis metus a est sodales congue eu a ipsum. Vestibulum hendrerit, ligula sed pulvinar lobortis, lectus felis aliquet mi, vel iaculis magna quam quis ante. Quisque at molestie odio, vitae efficitur libero. Phasellus ut molestie urna, eget sollicitudin quam. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Quisque urna metus, vestibulum id lectus lobortis, facilisis placerat eros. Pellentesque interdum vel nibh ut fermentum. Sed euismod interdum ligula, ac facilisis nulla blandit at. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Curabitur tristique volutpat pretium. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.`,
     topPhotoLink: '',
     photoLinks: [''],
-    isDraft: false,
     authorId: 1,
+    isPublished: true,
   },
   {
     title: 'F1 in Schools World Final to be shown live on Motorsport.tv',
@@ -165,8 +189,8 @@ export const initialCategories: Array<CreateNews & { authorId: number }> = [
     content: `F1 in Schools, set up in 1999, has welcome thousands of school to join the competition since its formation – reaching over 52 countries so far – and is aimed at inspiring children to experience science, technology, engineering and mathematics through F1`,
     topPhotoLink: '',
     photoLinks: [''],
-    isDraft: false,
     authorId: 1,
+    isPublished: true,
   },
   {
     title: `Kleinschmidt's unexpected return to racing with CUPRA`,
@@ -176,19 +200,7 @@ export const initialCategories: Array<CreateNews & { authorId: number }> = [
     topPhotoLink:
       'https://cdn-2.motorsport.com/images/mgl/24v8gOd6/s8/jutta-kleinschmidt-mattias-eks-1.jpg',
     photoLinks: [''],
-    isDraft: false,
     authorId: 1,
+    isPublished: true,
   },
 ];
-
-export const initNewsData = async (sequelize: Sequelize, isDropTable: boolean) => {
-  const NewsModel = createNewsModel(sequelize);
-  if (isDropTable) {
-    await NewsModel.drop();
-  }
-  await NewsModel.sync({ force: true });
-  const promises = initialCategories.map(async data => {
-    await NewsModel.create(createNewsToModel(data));
-  });
-  return Promise.all(promises);
-};

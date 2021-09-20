@@ -2,6 +2,8 @@ import { Sequelize, Model, DataTypes, Optional } from 'sequelize';
 import { Author, CreateAuthor } from 'src/types/generated';
 import * as R from 'ramda';
 
+import { ModelsStore } from './models.store';
+
 interface AuthorCreationAttributes extends Optional<Author, 'id'> {}
 
 interface AuthorInstance extends Model<Author, AuthorCreationAttributes>, Author {}
@@ -39,12 +41,11 @@ export const initialCategories: CreateAuthor[] = [
   },
 ];
 
-export const initAuthorData = async (sequelize: Sequelize) => {
-  const model = createAuthorModel(sequelize);
+export const initAuthorData = async (sequelize: Sequelize, { AuthorModel }: ModelsStore) => {
   // await AuthorModel.drop();
-  await model.sync({ force: true });
+  await AuthorModel.sync({ force: true });
   const promises = initialCategories.map(async data => {
-    await model.create(data);
+    await AuthorModel.create(data);
   });
   return Promise.all(promises);
 };
