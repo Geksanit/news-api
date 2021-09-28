@@ -192,13 +192,6 @@ components:
           type: string
         categoryId:
           type: number
-        tagsIds:
-          type: array
-          uniqueItems: true
-          minItems: 1
-          maxItems: 10
-          items:
-            type: number
         content:
           type: string
         topPhotoLink:

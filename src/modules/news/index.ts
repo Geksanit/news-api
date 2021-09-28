@@ -16,8 +16,8 @@ import {
   getOrder,
   getSearchTextFilter,
   getTagFilter,
-  TagFilter,
   tagsToJSON,
+  TagFilter,
 } from './model';
 import { ModelsStore } from '../../models/models.store';
 
@@ -59,7 +59,7 @@ export const makeRouter = (sequelize: Sequelize, modelsStore: ModelsStore) => {
       const { order } = (req.query as unknown) as { order: NewsOrder };
       const stringifiedOrder = getOrder(order);
       const stringifiedFilters = [
-        'n."isDraft" = false',
+        'True',
         getTagFilter({ tag, tags__in, tags__all }),
         getCreatedAtFilter({ created_at, created_at__lt, created_at__gt }),
         getSearchTextFilter(searchText),
@@ -73,7 +73,7 @@ export const makeRouter = (sequelize: Sequelize, modelsStore: ModelsStore) => {
       const fullNews = await sequelize.query(
         `
           SELECT n.id, (${authorToJSON}) as author, ARRAY(${categoryToJSON}) as category, ARRAY(${tagsToJSON}) as tags,
-            n."createdAt", n.title, n.content, n."topPhotoLink", n."photoLinks", n."isDraft"
+            n."createdAt", n.title, n.content, n."topPhotoLink", n."photoLinks"
           FROM "News" as n
           JOIN "Authors" as a ON a.id = n."authorId"
           JOIN "Users" as u ON a.id = u.id
@@ -105,6 +105,34 @@ export const makeRouter = (sequelize: Sequelize, modelsStore: ModelsStore) => {
         },
       );
       res.json(fullNews);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  router.get('/drafts/publish/:id', authenticateAdmin, async (req, res, next) => {
+    try {
+      const {
+        params: { id },
+      } = req;
+      const draft = await NewsDraftModel.findOne({
+        where: { id },
+      });
+      if (!draft) {
+        throw new HttpError(400, 'not found draft');
+      }
+      const tags = await draft.getTags();
+      const news = await draft.getNews();
+      if (news) {
+        await news.update(getNewsFromInstance(draft));
+        const oldTags = await news.getTags();
+        await news.removeTags(oldTags);
+        await news.addTags(tags);
+      } else {
+        const newNews = await draft.createNews(getNewsFromInstance(draft));
+        await newNews.addTags(tags);
+      }
+      res.status(201);
     } catch (error) {
       next(error);
     }
@@ -178,25 +206,6 @@ export const makeRouter = (sequelize: Sequelize, modelsStore: ModelsStore) => {
       }
       await draft.destroy();
       res.send('deleted');
-    } catch (error) {
-      next(error);
-    }
-  });
-
-  router.get('/drafts/publish/:id', authenticateAdmin, async (req, res, next) => {
-    // todo add in openapi
-    try {
-      const {
-        params: { id },
-      } = req;
-      const draft = await NewsDraftModel.findOne({
-        where: { id },
-      });
-      if (!draft) {
-        throw new HttpError(400, 'not found draft');
-      }
-      await draft.createNews(getNewsFromInstance(draft));
-      res.status(201);
     } catch (error) {
       next(error);
     }

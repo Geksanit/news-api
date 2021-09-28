@@ -3,8 +3,11 @@ import { Sequelize, Model, DataTypes } from 'sequelize';
 import { News, CreateNews } from 'src/types/generated';
 
 import { ModelsStore } from './models.store';
+import { createTagModel, TagInstance } from './tags';
 
 export interface NewsInstance extends Model<News, CreateNews & { authorId: number }>, News {}
+export type NewsTags = { NewsId: number; TagId: number };
+export interface NewsTagsInstance extends Model<NewsTags, NewsTags>, NewsTags {}
 export type NewsAttributes = News;
 
 const attributers = {
@@ -21,9 +24,6 @@ const attributers = {
   },
   categoryId: {
     type: DataTypes.INTEGER,
-  },
-  tagsIds: {
-    type: DataTypes.ARRAY(DataTypes.INTEGER),
   },
   content: {
     type: DataTypes.TEXT,
@@ -45,12 +45,55 @@ export const createNewsModel = <Instance extends NewsInstance>(sequalize: Sequel
 export const createNewsDraftModel = <Instance extends NewsInstance>(sequalize: Sequelize) =>
   sequalize.define<Instance, NewsAttributes>('NewsDraft', attributers);
 
+export const createNewsTagsModel = <Instance extends NewsTagsInstance>(
+  sequalize: Sequelize,
+  NewsModel: ReturnType<typeof createNewsModel>,
+  TagModel: ReturnType<typeof createTagModel>,
+) =>
+  sequalize.define<Instance, NewsTags>('NewsTags', {
+    NewsId: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: NewsModel,
+        key: 'id',
+      },
+    },
+    TagId: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: TagModel,
+        key: 'id',
+      },
+    },
+  });
+
+export const createNewsDraftTagsModel = <Instance extends NewsTagsInstance>(
+  sequalize: Sequelize,
+  NewsDraftModel: ReturnType<typeof createNewsDraftModel>,
+  TagModel: ReturnType<typeof createTagModel>,
+) =>
+  sequalize.define<Instance, NewsTags>('NewsDraftTags', {
+    NewsId: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: NewsDraftModel,
+        key: 'id',
+      },
+    },
+    TagId: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: TagModel,
+        key: 'id',
+      },
+    },
+  });
+
 export const newsAttributes: Array<keyof News> = [
   'id',
   'title',
   'authorId',
   'categoryId',
-  'tagsIds',
   'content',
   'createdAt',
   'topPhotoLink',
@@ -71,25 +114,32 @@ export const createNewsToModel = ({
 
 export const initNewsData = async (
   seq: Sequelize,
-  { NewsModel, NewsDraftModel }: ModelsStore,
-  isDropTable: boolean,
+  { NewsModel, NewsDraftModel, TagModel, NewsTagModel, NewsDraftTagModel }: ModelsStore,
 ) => {
-  if (isDropTable) {
-    await NewsModel.drop();
-    await NewsDraftModel.drop();
-  }
   await NewsDraftModel.sync({ force: true });
   await NewsModel.sync({ force: true });
-  const promises = initialData.map(async data => {
-    const draftInstance = await NewsDraftModel.create(createNewsToModel(data));
-    if (data.isPublished) {
-      await draftInstance.createNews(createNewsToModel(data));
+  await NewsDraftTagModel.sync({ force: true });
+  await NewsTagModel.sync({ force: true });
+
+  const promises = initialData.map(async ({ isPublished, tagsIds, ...data }) => {
+    const value = createNewsToModel(data);
+    const draftInstance = await NewsDraftModel.create(value);
+    const tagsA = await Promise.all(
+      tagsIds.map(tagId => TagModel.findOne({ where: { id: tagId } })),
+    );
+    const tags = tagsA.filter(v => v) as TagInstance[];
+    await draftInstance.addTags(tags);
+    if (isPublished) {
+      const newsInstance = await draftInstance.createNews(value);
+      await newsInstance.addTags(tags);
     }
   });
   return Promise.all(promises);
 };
 
-export const initialData: Array<CreateNews & { authorId: number; isPublished: boolean }> = [
+export const initialData: Array<
+  CreateNews & { authorId: number; isPublished: boolean; tagsIds: number[] }
+> = [
   {
     title: 'Truck carrying tomato puree crashes, turning road red',
     categoryId: 1,

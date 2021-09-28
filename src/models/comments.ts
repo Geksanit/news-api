@@ -4,10 +4,12 @@ import { Comment, CreateComment } from 'src/types/generated';
 
 import { ModelsStore } from './models.store';
 
-interface CommentInstance extends Model<Comment, CreateComment & { userId: number }>, Comment {}
+export interface CommentInstance
+  extends Model<Comment, CreateComment & { userId: number }>,
+    Comment {}
 
-export const createCommentModel = (sequalize: Sequelize) =>
-  sequalize.define<CommentInstance>('Comment', {
+export const createCommentModel = <T extends CommentInstance>(sequalize: Sequelize) =>
+  sequalize.define<T, Comment>('Comment', {
     id: {
       type: DataTypes.INTEGER,
       autoIncrement: true,
@@ -45,7 +47,6 @@ export const initialCategories: Array<CreateComment & { userId: number }> = [
 ];
 
 export const initCommentData = async (sequelize: Sequelize, { CommentModel }: ModelsStore) => {
-  // await CommentModel.drop();
   await CommentModel.sync({ force: true });
   const promises = initialCategories.map(async data => {
     await CommentModel.create(data);

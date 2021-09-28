@@ -57,8 +57,9 @@ export const getSearchTextFilter = (text: string | undefined) =>
 
 export const tagsToJSON = `
   SELECT json_build_object('id', t.id, 'label', t.label) as tag
-  FROM "Tags" as t
-  WHERE t.id = ANY(n."tagsIds")
+  FROM "NewsTags" as nt
+  JOIN "Tags" as t ON t.id = nt."TagId"
+  WHERE nt."NewsId" = n.id
 `;
 
 // old, not recursive query

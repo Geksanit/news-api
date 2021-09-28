@@ -1,15 +1,13 @@
-import { Sequelize, Model, DataTypes, Optional } from 'sequelize';
+import { Sequelize, Model, DataTypes } from 'sequelize';
 import { Author, CreateAuthor } from 'src/types/generated';
 import * as R from 'ramda';
 
 import { ModelsStore } from './models.store';
 
-interface AuthorCreationAttributes extends Optional<Author, 'id'> {}
+export interface AuthorInstance extends Model<Author, CreateAuthor>, Author {}
 
-interface AuthorInstance extends Model<Author, AuthorCreationAttributes>, Author {}
-
-export const createAuthorModel = (sequalize: Sequelize) =>
-  sequalize.define<AuthorInstance>('Author', {
+export const createAuthorModel = <T extends AuthorInstance>(sequalize: Sequelize) =>
+  sequalize.define<T, Author>('Author', {
     id: {
       type: DataTypes.INTEGER,
       autoIncrement: true,
@@ -42,7 +40,6 @@ export const initialCategories: CreateAuthor[] = [
 ];
 
 export const initAuthorData = async (sequelize: Sequelize, { AuthorModel }: ModelsStore) => {
-  // await AuthorModel.drop();
   await AuthorModel.sync({ force: true });
   const promises = initialCategories.map(async data => {
     await AuthorModel.create(data);

@@ -5,12 +5,12 @@ import * as R from 'ramda';
 import { getHash } from '../libs/passwordHash';
 import { ModelsStore } from './models.store';
 
-interface UserCreationAttributes extends Optional<UserModel, 'id'> {}
+export interface UserCreationAttributes extends Optional<UserModel, 'id'> {}
 
-interface UserInstance extends Model<UserModel, UserCreationAttributes>, UserModel {}
+export interface UserInstance extends Model<UserModel, UserCreationAttributes>, UserModel {}
 
-export const createUserModel = (sequalize: Sequelize) =>
-  sequalize.define<UserInstance>('User', {
+export const createUserModel = <T extends UserInstance>(sequalize: Sequelize) =>
+  sequalize.define<T, UserCreationAttributes>('User', {
     id: {
       type: DataTypes.INTEGER,
       autoIncrement: true,
@@ -86,14 +86,7 @@ export const initialCategories: Array<CreateUser & { isAdmin: boolean }> = [
   },
 ];
 
-export const initUserData = async (
-  sequelize: Sequelize,
-  { UserModel: UModel }: ModelsStore,
-  isDropTable: boolean,
-) => {
-  if (isDropTable) {
-    await UModel.drop();
-  }
+export const initUserData = async (sequelize: Sequelize, { UserModel: UModel }: ModelsStore) => {
   await UModel.sync({ force: true });
   const promises = initialCategories.map(async data => {
     await UModel.create({ ...createUserToModel(data), isAdmin: data.isAdmin });

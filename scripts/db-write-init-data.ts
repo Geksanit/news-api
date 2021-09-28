@@ -9,9 +9,10 @@ import { initNewsData } from '../src/models/news';
 import { initTagData } from '../src/models/tags';
 import { getConfig } from '../src/config';
 import { createModelsStore } from '../src/models/models.store';
+import { log } from '../src/libs/log';
 
 const script = async () => {
-  console.log('db initial data started');
+  log.info('db write initial data started');
   const config = getConfig();
   const sequelize = new Sequelize(config.DB_NAME, 'postgres', config.DB_PASS, {
     host: 'localhost',
@@ -19,24 +20,45 @@ const script = async () => {
   });
   try {
     await sequelize.authenticate();
-    console.log('Connection has been established successfully.');
+    log.info('Connection has been established successfully.');
   } catch (error) {
-    console.error('Unable to connect to the database:', error);
+    log.error('Unable to connect to the database:', error);
     return;
   }
   try {
     const store = createModelsStore(sequelize);
-    const userTask = async (seq: Sequelize) => {
-      await initUserData(seq, store, true);
-      await initAuthorData(seq, store);
-    };
-    const tasks = [initCategoryData, userTask, initTagData, initCommentData, initNewsData];
-    const promises: Promise<any>[] = tasks.map(task => task(sequelize, store, true));
-    await Promise.all(promises);
+    const {
+      AuthorModel,
+      UserModel,
+      NewsModel,
+      NewsDraftModel,
+      CommentModel,
+      TagModel,
+      CategoryModel,
+      NewsDraftTagModel,
+      NewsTagModel,
+    } = store;
 
-    console.log('script completed');
+    await CommentModel.drop();
+    await NewsTagModel.drop();
+    await NewsDraftTagModel.drop();
+    await NewsModel.drop();
+    await NewsDraftModel.drop();
+    await AuthorModel.drop();
+    await UserModel.drop();
+    await CategoryModel.drop();
+    await TagModel.drop();
+
+    await initTagData(sequelize, store);
+    await initCategoryData(sequelize, store);
+    await initUserData(sequelize, store);
+    await initAuthorData(sequelize, store);
+    await initNewsData(sequelize, store);
+    await initCommentData(sequelize, store);
+
+    log.info('script completed successfully');
   } catch (error) {
-    console.error('create error', error);
+    log.error('script error', error);
   }
 };
 

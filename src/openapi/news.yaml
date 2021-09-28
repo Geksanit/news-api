@@ -106,8 +106,6 @@ paths:
                 type: array
                 items:
                   $ref: "difinitions.yaml#/components/schemas/FullNews"
-        500:
-          description: Unexpected Error
 
   /posts/{id}:
     get:
@@ -128,8 +126,6 @@ paths:
             application/json:
               schema:
                $ref: "difinitions.yaml#/components/schemas/FullNews"
-        500:
-          description: Unexpected Error
 
   /posts/raw/:
     get:
@@ -162,8 +158,7 @@ paths:
                 type: array
                 items:
                   $ref: "difinitions.yaml#/components/schemas/News"
-        500:
-          description: Unexpected Error
+
   /posts/drafts/:
     get:
       tags:
@@ -195,8 +190,6 @@ paths:
                 type: array
                 items:
                   $ref: "difinitions.yaml#/components/schemas/News"
-        500:
-          description: Unexpected Error
 
     post:
       tags:
@@ -218,10 +211,6 @@ paths:
             application/json:
               schema:
                 $ref: "difinitions.yaml#/components/schemas/News"
-        400:
-          description: Invalid request provided
-        500:
-          description: Unexpected Error
 
     patch:
       tags:
@@ -239,11 +228,8 @@ paths:
       responses:
         200:
           description: Successful operation
-        400:
-          description: Invalid request provided
-        500:
-          description: Unexpected Error
 
+  /posts/drafts/{id}:
     delete:
       security:
         - cookieAuth: []
@@ -260,7 +246,21 @@ paths:
       responses:
         200:
           description: Successful operation
-        400:
-          description: Invalid request provided
-        500:
-          description: Unexpected Error
+
+  /posts/drafts/publish/{id}:
+    get:
+      security:
+        - cookieAuth: []
+      tags:
+        - News
+      summary: publish News (available only for author)
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: 
+            type: integer
+          description: News publish request
+      responses:
+        200:
+          description: Successful operation
