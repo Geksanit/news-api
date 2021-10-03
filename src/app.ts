@@ -23,7 +23,7 @@ import { createModelsStore } from './models/models.store';
 const apiSpec = path.resolve(__dirname, './openapi/generated.yaml');
 const swaggerDocument = yaml.load(apiSpec);
 const config = getConfig();
-const sequelize = new Sequelize(config.DB_NAME, 'postgres', config.DB_PASS, {
+const sequelize = new Sequelize(config.DB_NAME, config.DB_USER, config.DB_PASS, {
   host: 'localhost',
   dialect: 'postgres',
 });
