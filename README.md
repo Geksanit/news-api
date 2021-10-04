@@ -15,12 +15,14 @@
 - генерация типов по openapi спецификации `yarn gen:types`
 - генерация спеки для swagger `yarn gen:swagger`
 - генерация соли для хеширования паролей `yarn gen:salt`
+- миграции `npx sequelize-cli db:migrate`
 
 ### Переменные окружения <a name="env"></a> 
 .env
 ```
 DB_PASS
 DB_NAME
+DB_USER
 HASH_SALT
 JWT_SECRET_KEY
 ```
