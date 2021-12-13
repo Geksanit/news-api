@@ -37,12 +37,12 @@ export const initialCategories: Array<CreateComment & { userId: number }> = [
   {
     newsId: 1,
     userId: 1,
-    content: 'comment text 1',
+    content: 'О интересно, не знал',
   },
   {
     newsId: 1,
     userId: 2,
-    content: 'comment text 2',
+    content: 'А я знал)',
   },
 ];
 

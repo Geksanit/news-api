@@ -39,31 +39,31 @@ export const getCategoryFromInstance = ({
 export const initialCategories: CreateCategory[] = [
   {
     parentCategoryId: null,
-    label: 'politics',
+    label: 'Политика',
   },
   {
     parentCategoryId: null,
-    label: 'business',
+    label: 'Бизнес',
   },
   {
     parentCategoryId: null,
-    label: 'health',
+    label: 'Здоровье',
   },
   {
     parentCategoryId: null,
-    label: 'sports',
+    label: 'Спорт',
   },
   {
     parentCategoryId: 4,
-    label: 'auto sport',
+    label: 'Авто спорт',
   },
   {
     parentCategoryId: 5,
-    label: 'Formula 1',
+    label: 'Формула 1',
   },
   {
     parentCategoryId: 5,
-    label: 'Rally sport',
+    label: 'Ралли спорт',
   },
 ];
 

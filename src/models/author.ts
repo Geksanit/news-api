@@ -31,11 +31,11 @@ export const getAuthorFromInstance = (instance: AuthorInstance): Author =>
 export const initialCategories: CreateAuthor[] = [
   {
     userId: 1,
-    description: 'First author on site',
+    description: 'Автор интереснейших новостей',
   },
   {
     userId: 2,
-    description: 'Second author on site',
+    description: 'Пишу новости, потому что мне это нравится',
   },
 ];
 

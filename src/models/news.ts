@@ -141,26 +141,27 @@ export const initialData: Array<
   CreateNews & { authorId: number; isPublished: boolean; tagsIds: number[] }
 > = [
   {
-    title: 'Truck carrying tomato puree crashes, turning road red',
+    title: 'Грузовик с томатным пюре разбивается, дорога становится красной',
     categoryId: 1,
     tagsIds: [1, 2],
-    content: `A truck laden with tomato puree crashed in England this week, turning a highway red and prompting a number of food-related puns from people on social media.
-    The vehicle was involved in a crash with another truck in Cambridgeshire, eastern England, on Tuesday, Highways England told CNN.
-    The government highways authority said the vehicle "lost its load and damaged the carriageway," leading to a road closure on the A14.
-    One driver sustained a "minor" injury, Highways England said.
-    A spokesman confirmed it was carrying tomato puree, which spilled across the road and prompted emergency road resurfacing overnight until Wednesday afternoon.`,
+    content: `На этой неделе в Англии разбился грузовик, груженый томатным пюре, в результате чего шоссе стало красным, что вызвало ряд каламбурных слов, связанных с едой, со стороны людей в социальных сетях.
+    Автомобиль попал в аварию с другим грузовиком в Кембриджшире, восточная Англия, во вторник, сообщили CNN в Highways England.
+    Управление государственных автомагистралей заявило, что автомобиль «потерял груз и повредил проезжую часть», что привело к перекрытию дороги на A14.
+    Один водитель получил "легкую" травму, сообщает Highways England.
+    Представитель компании подтвердил, что везет томатное пюре, которое разлилось через дорогу и привело к экстренному ремонту дороги в течение ночи до полудня среды.`,
     topPhotoLink:
       'https://cdn.cnn.com/cnnnext/dam/assets/210603052531-restricted-england-crash-tomato-puree-0602-exlarge-169.jpg',
-    photoLinks: ['photo1'],
+    photoLinks: [],
     isPublished: true,
     authorId: 1,
   },
   {
-    title: 'New Zealand is a Five Eyes outlier on China. It may have to pick a side',
+    title:
+      'Новая Зеландия находится в стороне от Китая на пять глаз. Возможно, придется выбрать сторону',
     categoryId: 1,
     tagsIds: [1, 2],
-    content: `"Could it be that New Zealand is turning into ... New Xi Land?" questioned an ominous voice over.
-    It was part of a preview for an incendiary segment of Australian TV show "60 Minutes" premised on the idea that New Zealand is so desperate to keep China, its biggest trading partner, onside that it has cast aside both its morals and its friendship with Canberra.`,
+    content: `«Может быть, Новая Зеландия превращается в ... Новую Землю Кси?» - спросил зловещий голос.
+    Это было частью превью зажигательного сегмента австралийского телешоу "60 минут", основанного на идее о том, что Новая Зеландия так отчаянно пытается удержать Китай, своего крупнейшего торгового партнера, в стороне, что отбросила как свою мораль, так и дружбу с Канберра.`,
     topPhotoLink:
       'https://cdn.cnn.com/cnnnext/dam/assets/210602221801-05-new-zealand-xinjiang-china-intl-hnk-exlarge-169.jpg',
     photoLinks: ['photo1', 'photo2', 'photo3'],
@@ -168,7 +169,7 @@ export const initialData: Array<
     authorId: 2,
   },
   {
-    title: 'My SUPER clickbait news',
+    title: 'Моя супер новость',
     categoryId: 1,
     tagsIds: [2],
     content: `bla bla bla`,
@@ -199,7 +200,7 @@ export const initialData: Array<
     isPublished: true,
   },
   {
-    title: `Azerbaijan Grand Prix: Sergio Perez wins after Max Verstappen high speed crash`,
+    title: `Гран-при Азербайджана: Серхио Перес победил после крушения Макса Ферстаппена на высокой скорости`,
     categoryId: 6,
     tagsIds: [5, 4],
     content: `Duis pharetra vestibulum felis, non posuere lorem placerat iaculis. Maecenas hendrerit commodo dapibus. Integer sapien erat, efficitur convallis auctor et, pellentesque at turpis. Sed hendrerit ante nisi, et mattis odio pellentesque nec. Aenean purus arcu, posuere id porttitor sagittis, tristique quis ante. Duis a laoreet neque. Proin a urna semper, molestie mi vitae, tristique velit. Proin non blandit sem.`,
@@ -211,7 +212,7 @@ export const initialData: Array<
   },
   {
     title:
-      'Barcelona forward Martin Braithwaite scored as Denmark beat Bosnia-Herzegovina in their final warm-up match before Euro 2020.',
+      'Нападающий «Барселоны» Мартин Брейтуэйт забил, когда Дания обыграла Боснию и Герцеговину в финальном матче разминки перед Евро-2020.',
     categoryId: 4,
     tagsIds: [6],
     content: `Donec volutpat, mi in porta efficitur, mi quam sodales augue, sit amet suscipit nunc felis ac urna. Nunc eu lorem eu purus ultrices viverra. Maecenas quis sagittis ex, in maximus nulla. Curabitur quis orci egestas, sodales enim et, auctor eros. Donec faucibus sem id ultrices iaculis. Aliquam metus leo, consequat in erat nec, aliquam tristique nisl. Ut venenatis, mi eget vulputate semper, erat odio rhoncus purus, vel volutpat ligula eros vel ligula. Duis ac dictum erat. Pellentesque nec nisl nec ante ullamcorper pellentesque non eu urna. Nam ultricies convallis metus, id consequat augue dictum consectetur.`,
@@ -223,7 +224,7 @@ export const initialData: Array<
   },
 
   {
-    title: '6 Easy Ways to Make Your Own Memes',
+    title: '6 простых способов сделать свои собственные мемы',
     categoryId: 1,
     tagsIds: [3],
     content: `Integer quis metus a est sodales congue eu a ipsum. Vestibulum hendrerit, ligula sed pulvinar lobortis, lectus felis aliquet mi, vel iaculis magna quam quis ante. Quisque at molestie odio, vitae efficitur libero. Phasellus ut molestie urna, eget sollicitudin quam. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Quisque urna metus, vestibulum id lectus lobortis, facilisis placerat eros. Pellentesque interdum vel nibh ut fermentum. Sed euismod interdum ligula, ac facilisis nulla blandit at. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Curabitur tristique volutpat pretium. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.`,
@@ -233,17 +234,17 @@ export const initialData: Array<
     isPublished: true,
   },
   {
-    title: 'F1 in Schools World Final to be shown live on Motorsport.tv',
+    title: 'Формула 1 в финале школьного мира будет показана в прямом эфире на Motorsport.tv',
     categoryId: 6,
     tagsIds: [4, 8],
-    content: `F1 in Schools, set up in 1999, has welcome thousands of school to join the competition since its formation – reaching over 52 countries so far – and is aimed at inspiring children to experience science, technology, engineering and mathematics through F1`,
+    content: `F1 в школах, созданный в 1999 году, с момента своего создания приветствовал тысячи школ, которые присоединились к конкурсу - на данный момент охватил более 52 стран - и направлен на то, чтобы вдохновить детей познавать науку, технологии, инженерию и математику с помощью F1.`,
     topPhotoLink: '',
     photoLinks: [''],
     authorId: 1,
     isPublished: true,
   },
   {
-    title: `Kleinschmidt's unexpected return to racing with CUPRA`,
+    title: `Неожиданное возвращение Кляйншмидта в гонки с CUPRA`,
     categoryId: 7,
     tagsIds: [4, 8],
     content: `Integer quis metus a est sodales congue eu a ipsum. Vestibulum hendrerit, ligula sed pulvinar lobortis, lectus felis aliquet mi, vel iaculis magna quam quis ante. Quisque at molestie odio, vitae efficitur libero. Phasellus ut molestie urna, eget sollicitudin quam. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Quisque urna metus, vestibulum id lectus lobortis, facilisis placerat eros. Pellentesque interdum vel nibh ut fermentum. Sed euismod interdum ligula, ac facilisis nulla blandit at. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Curabitur tristique volutpat pretium. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.`,
