@@ -72,7 +72,7 @@ export const makeRouter = (sequelize: Sequelize, modelsStore: ModelsStore) => {
         .join(' AND ');
       const fullNews = await sequelize.query(
         `
-          SELECT n.id, (${authorToJSON}) as author, ARRAY(${categoryToJSON}) as category, ARRAY(${tagsToJSON}) as tags,
+          SELECT n.id, (${authorToJSON}) as author, (${categoryToJSON}) as category, ARRAY(${tagsToJSON}) as tags,
             n."createdAt", n.title, n.content, n."topPhotoLink", n."photoLinks"
           FROM "News" as n
           JOIN "Authors" as a ON a.id = n."authorId"

@@ -203,6 +203,13 @@ components:
           maxItems: 10
           items: 
             type: string
+        tags:
+          type: array
+          uniqueItems: true
+          minItems: 1
+          maxItems: 10
+          items:
+            $ref: "#/components/schemas/Tag"
       required:
         - title
         - categoryId
@@ -210,6 +217,7 @@ components:
         - content
         - topPhotoLink
         - photoLinks
+        - tags
     FullNews:
       type: object
       properties:

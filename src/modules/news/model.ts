@@ -26,10 +26,10 @@ export type TagFilter = {
 };
 
 export const getTagFilter = (filter: TagFilter): string | null => {
-  if (filter.tag) return `:tag = ANY (n."tagsIds")`;
-  if (filter.tags__in) return `ARRAY[:tags__in] && n."tagsIds"`;
+  if (filter.tag) return `:tag = ANY(${tagsIds})`;
+  if (filter.tags__in) return `ARRAY[:tags__in] && ARRAY(${tagsIds})`;
   if (filter.tags__all)
-    return `(ARRAY[:tags__all] @> n."tagsIds") AND (ARRAY[:tags__all] <@ n."tagsIds")`;
+    return `(ARRAY[:tags__all] @> ARRAY(${tagsIds})) AND (ARRAY[:tags__all] <@ ARRAY(${tagsIds}))`;
   return null;
 };
 
@@ -50,7 +50,7 @@ export const getSearchTextFilter = (text: string | undefined) =>
       :searchText = ANY(ARRAY(
         SELECT t.label
         FROM "Tags" as t
-        WHERE t.id = ANY(n."tagsIds")
+        WHERE t.id = ANY(ARRAY(${tagsIds}))
       ))
     )`
     : null;
@@ -59,6 +59,12 @@ export const tagsToJSON = `
   SELECT json_build_object('id', t.id, 'label', t.label) as tag
   FROM "NewsTags" as nt
   JOIN "Tags" as t ON t.id = nt."TagId"
+  WHERE nt."NewsId" = n.id
+`;
+
+export const tagsIds = `
+  SELECT nt."TagId"
+  FROM "NewsTags" as nt
   WHERE nt."NewsId" = n.id
 `;
 
@@ -89,7 +95,7 @@ export const authorToJSON = `json_build_object(${userFields}, 'discription', a.d
 export const getOrder = ({
   by = NewsOrder.by.DATE,
   direction = NewsOrder.direction.ASC,
-}: NewsOrder): string => {
+}: NewsOrder = {}): string => {
   const d = direction === NewsOrder.direction.ASC ? 'ASC' : 'DESC';
   switch (by) {
     case NewsOrder.by.DATE:

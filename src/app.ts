@@ -7,6 +7,7 @@ import swaggerUi from 'swagger-ui-express';
 import yaml from 'yamljs';
 import path from 'path';
 import * as OpenApiValidator from 'express-openapi-validator';
+import cors from 'cors';
 
 import * as categories from './modules/categories';
 import * as users from './modules/users';
@@ -29,6 +30,12 @@ const sequelize = new Sequelize(config.DB_NAME, config.DB_USER, config.DB_PASS, 
 });
 const app = express();
 
+app.use(
+  cors({
+    credentials: true,
+    origin: ['http://localhost:3000'],
+  }),
+);
 app.use(bodyParser.json());
 app.use(cookieParser());
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
