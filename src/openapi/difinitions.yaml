@@ -203,13 +203,13 @@ components:
           maxItems: 10
           items: 
             type: string
-        tags:
+        tagIds:
           type: array
           uniqueItems: true
           minItems: 1
           maxItems: 10
           items:
-            $ref: "#/components/schemas/Tag"
+            type: number
       required:
         - title
         - categoryId
@@ -217,10 +217,11 @@ components:
         - content
         - topPhotoLink
         - photoLinks
-        - tags
     FullNews:
       type: object
       properties:
+        id: 
+          type: integer
         title:
           type: string
         createdAt:
@@ -231,7 +232,12 @@ components:
         author:
           $ref: "#/components/schemas/FullAuthor"
         category:
-          $ref: "#/components/schemas/Category"
+          type: array
+          uniqueItems: true
+          minItems: 1
+          maxItems: 10
+          items:
+            $ref: "#/components/schemas/Category"
         tags:
           type: array
           uniqueItems: true
@@ -251,6 +257,7 @@ components:
           items: 
             type: string
       required:
+        - id
         - title
         - createdAt
         - author

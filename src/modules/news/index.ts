@@ -6,7 +6,7 @@ import { HttpError } from '../../utils/Errors';
 import { createLogger } from '../../middlewares/logger';
 import { createNewsToModel, getNewsFromInstance, newsAttributes } from '../../models/news';
 import { authenticateAdmin, authenticateUser } from '../../middlewares/authenticate';
-import { CreateNews, News, NewsOrder, Pagination, UserView } from '../../types/generated';
+import { CreateNews, News, Pagination, UserView } from '../../types/generated';
 import {
   authorToJSON,
   categoryToJSON,
@@ -56,8 +56,7 @@ export const makeRouter = (sequelize: Sequelize, modelsStore: ModelsStore) => {
         created_at__lt,
         created_at__gt,
       } = (req.query as unknown) as CreatedAtFilter;
-      const { order } = (req.query as unknown) as { order: NewsOrder };
-      const stringifiedOrder = getOrder(order);
+      const stringifiedOrder = getOrder(req.query);
       const stringifiedFilters = [
         'True',
         getTagFilter({ tag, tags__in, tags__all }),
@@ -72,7 +71,7 @@ export const makeRouter = (sequelize: Sequelize, modelsStore: ModelsStore) => {
         .join(' AND ');
       const fullNews = await sequelize.query(
         `
-          SELECT n.id, (${authorToJSON}) as author, (${categoryToJSON}) as category, ARRAY(${tagsToJSON}) as tags,
+          SELECT n.id, (${authorToJSON}) as author, ARRAY(${categoryToJSON}) as category, ARRAY(${tagsToJSON}) as tags,
             n."createdAt", n.title, n.content, n."topPhotoLink", n."photoLinks"
           FROM "News" as n
           JOIN "Authors" as a ON a.id = n."authorId"

@@ -11,20 +11,6 @@ paths:
       summary: All available news
       parameters:
         - in: query
-          name: offset
-          required: true
-          schema:
-            type: integer
-            example: 0
-          description: The number of items to skip before starting to collect the result set
-        - in: query
-          name: limit
-          required: true
-          schema:
-            type: integer
-            example: 5
-          description: The numbers of items to return
-        - in: query
           name: categoryId
           required: false
           schema:
@@ -88,14 +74,33 @@ paths:
           required: false
           schema:
             type: string
-
+      
         - in: query
-          name: order
+          name: by
           required: false
-          content:
-            application/json:
-              schema:
-                $ref: "difinitions.yaml#/components/schemas/NewsOrder"
+          schema:
+            type: string
+            enum: [date, author, category, photoCount]
+        - in: query
+          name: direction
+          required: false
+          schema:
+            type: string
+            enum: [asc, desc]
+        - in: query
+          name: limit
+          required: true
+          schema:
+            type: integer
+            example: 5
+          description: The numbers of items to return
+        - in: query
+          name: offset
+          required: true
+          schema:
+            type: integer
+            example: 0
+          description: The number of items to skip before starting to collect the result set
 
       responses:
         200:

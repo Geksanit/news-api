@@ -537,6 +537,13 @@ paths:
                           maxItems: 10
                           items:
                             type: string
+                        tagIds:
+                          type: array
+                          uniqueItems: true
+                          minItems: 1
+                          maxItems: 10
+                          items:
+                            type: number
                       required:
                         - title
                         - categoryId
@@ -565,22 +572,6 @@ paths:
         - News
       summary: All available news
       parameters:
-        - in: query
-          name: offset
-          required: true
-          schema:
-            type: integer
-            example: 0
-          description: >-
-            The number of items to skip before starting to collect the result
-            set
-        - in: query
-          name: limit
-          required: true
-          schema:
-            type: integer
-            example: 5
-          description: The numbers of items to return
         - in: query
           name: categoryId
           required: false
@@ -644,25 +635,39 @@ paths:
           schema:
             type: string
         - in: query
-          name: order
+          name: by
           required: false
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  by:
-                    type: string
-                    enum:
-                      - date
-                      - author
-                      - category
-                      - photoCount
-                  direction:
-                    type: string
-                    enum:
-                      - asc
-                      - desc
+          schema:
+            type: string
+            enum:
+              - date
+              - author
+              - category
+              - photoCount
+        - in: query
+          name: direction
+          required: false
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+        - in: query
+          name: limit
+          required: true
+          schema:
+            type: integer
+            example: 5
+          description: The numbers of items to return
+        - in: query
+          name: offset
+          required: true
+          schema:
+            type: integer
+            example: 0
+          description: >-
+            The number of items to skip before starting to collect the result
+            set
       responses:
         '200':
           description: A list of news.
@@ -673,6 +678,8 @@ paths:
                 items:
                   type: object
                   properties:
+                    id:
+                      type: integer
                     title:
                       type: string
                     createdAt:
@@ -714,23 +721,28 @@ paths:
                           required:
                             - description
                     category:
-                      allOf:
-                        - type: object
-                          properties:
-                            parentCategoryId:
-                              nullable: true
-                              type: integer
-                            label:
-                              type: string
-                          required:
-                            - label
-                            - parentCategoryId
-                        - type: object
-                          properties:
-                            id:
-                              type: integer
-                          required:
-                            - id
+                      type: array
+                      uniqueItems: true
+                      minItems: 1
+                      maxItems: 10
+                      items:
+                        allOf:
+                          - type: object
+                            properties:
+                              parentCategoryId:
+                                nullable: true
+                                type: integer
+                              label:
+                                type: string
+                            required:
+                              - label
+                              - parentCategoryId
+                          - type: object
+                            properties:
+                              id:
+                                type: integer
+                            required:
+                              - id
                     tags:
                       type: array
                       uniqueItems: true
@@ -762,6 +774,7 @@ paths:
                       items:
                         type: string
                   required:
+                    - id
                     - title
                     - createdAt
                     - author
@@ -790,6 +803,8 @@ paths:
               schema:
                 type: object
                 properties:
+                  id:
+                    type: integer
                   title:
                     type: string
                   createdAt:
@@ -831,23 +846,28 @@ paths:
                         required:
                           - description
                   category:
-                    allOf:
-                      - type: object
-                        properties:
-                          parentCategoryId:
-                            nullable: true
-                            type: integer
-                          label:
-                            type: string
-                        required:
-                          - label
-                          - parentCategoryId
-                      - type: object
-                        properties:
-                          id:
-                            type: integer
-                        required:
-                          - id
+                    type: array
+                    uniqueItems: true
+                    minItems: 1
+                    maxItems: 10
+                    items:
+                      allOf:
+                        - type: object
+                          properties:
+                            parentCategoryId:
+                              nullable: true
+                              type: integer
+                            label:
+                              type: string
+                          required:
+                            - label
+                            - parentCategoryId
+                        - type: object
+                          properties:
+                            id:
+                              type: integer
+                          required:
+                            - id
                   tags:
                     type: array
                     uniqueItems: true
@@ -879,6 +899,7 @@ paths:
                     items:
                       type: string
                 required:
+                  - id
                   - title
                   - createdAt
                   - author
@@ -937,6 +958,13 @@ paths:
                           maxItems: 10
                           items:
                             type: string
+                        tagIds:
+                          type: array
+                          uniqueItems: true
+                          minItems: 1
+                          maxItems: 10
+                          items:
+                            type: number
                       required:
                         - title
                         - categoryId
@@ -987,6 +1015,13 @@ paths:
                   maxItems: 10
                   items:
                     type: string
+                tagIds:
+                  type: array
+                  uniqueItems: true
+                  minItems: 1
+                  maxItems: 10
+                  items:
+                    type: number
               required:
                 - title
                 - categoryId
@@ -1019,6 +1054,13 @@ paths:
                         maxItems: 10
                         items:
                           type: string
+                      tagIds:
+                        type: array
+                        uniqueItems: true
+                        minItems: 1
+                        maxItems: 10
+                        items:
+                          type: number
                     required:
                       - title
                       - categoryId
@@ -1070,6 +1112,13 @@ paths:
                       maxItems: 10
                       items:
                         type: string
+                    tagIds:
+                      type: array
+                      uniqueItems: true
+                      minItems: 1
+                      maxItems: 10
+                      items:
+                        type: number
                   required:
                     - title
                     - categoryId
