@@ -6,11 +6,30 @@ import { getCommentFromInstance } from '../../models/comments';
 import { authenticateAdmin, authenticateUser } from '../../middlewares/authenticate';
 import { CreateComment, UserView, Comment, Pagination } from '../../types/generated';
 import { ModelsStore } from '../../models/models.store';
+import { userViewAttributes } from '../../models/user';
 
 export const makeRouter = (modelsStore: ModelsStore) => {
-  const { NewsModel, CommentModel } = modelsStore;
+  const { NewsModel, CommentModel, UserModel } = modelsStore;
   const router = express.Router();
   router.use(createLogger(module));
+
+  router.get('/news/:id', async (req, res, next) => {
+    try {
+      const {
+        params: { id },
+      } = req;
+      const comments = await CommentModel.findAll({
+        where: {
+          newsId: id,
+        },
+        attributes: ['content', 'userId', 'newsId', 'id', 'createdAt'],
+        include: [{ model: UserModel, attributes: userViewAttributes }],
+      });
+      res.json(comments);
+    } catch (error) {
+      next(error);
+    }
+  });
 
   router.get('/', authenticateAdmin, async (req, res, next) => {
     try {

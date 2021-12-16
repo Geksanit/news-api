@@ -4,8 +4,8 @@ import { AuthorInstance, createAuthorModel } from './author';
 import { CategoryInstance, createCategoryModel } from './category';
 import { CommentInstance, createCommentModel } from './comments';
 import {
-  createNewsDraftModel,
-  createNewsDraftTagsModel,
+  createDraftModel,
+  createDraftTagsModel,
   createNewsModel,
   createNewsTagsModel,
   NewsInstance,
@@ -15,7 +15,7 @@ import { createUserModel, UserInstance } from './user';
 
 // all mixin types in https://github.com/ahmerb/sequelize-typescript-associations
 export interface NewsInstanceWithMixins extends NewsInstance {
-  getNewsDraft: Sequelize.BelongsToGetAssociationMixin<NewsDraftInstanceWithMixins>;
+  getDraft: Sequelize.BelongsToGetAssociationMixin<DraftInstanceWithMixins>;
 
   getComments: Sequelize.HasManyGetAssociationsMixin<CommentInstanceWithMixins>;
   addComments: Sequelize.HasManyAddAssociationsMixin<
@@ -68,7 +68,7 @@ export interface NewsInstanceWithMixins extends NewsInstance {
   countTags: Sequelize.HasManyCountAssociationsMixin;
 }
 
-export interface NewsDraftInstanceWithMixins extends NewsInstance {
+export interface DraftInstanceWithMixins extends NewsInstance {
   getNews: Sequelize.BelongsToGetAssociationMixin<NewsInstanceWithMixins>;
   createNews: Sequelize.BelongsToCreateAssociationMixin<NewsInstanceWithMixins>;
 
@@ -184,7 +184,7 @@ const getOptions = (key: string) => ({
  *  initialize models and associations
  */
 export const createModelsStore = (sequelize: Sequelize.Sequelize) => {
-  const NewsDraftModel = createNewsDraftModel<NewsDraftInstanceWithMixins>(sequelize);
+  const DraftModel = createDraftModel<DraftInstanceWithMixins>(sequelize);
   const NewsModel = createNewsModel<NewsInstanceWithMixins>(sequelize);
   const UserModel = createUserModel<UserInstanceWithMixins>(sequelize);
   const AuthorModel = createAuthorModel<AuthorInstanceWithMixins>(sequelize);
@@ -192,7 +192,7 @@ export const createModelsStore = (sequelize: Sequelize.Sequelize) => {
   const CategoryModel = createCategoryModel(sequelize);
   const TagModel = createTagModel(sequelize);
   const NewsTagModel = createNewsTagsModel(sequelize, NewsModel, TagModel);
-  const NewsDraftTagModel = createNewsDraftTagsModel(sequelize, NewsDraftModel, TagModel);
+  const DraftTagModel = createDraftTagsModel(sequelize, DraftModel, TagModel);
 
   CategoryModel.hasOne(CategoryModel, {
     foreignKey: {
@@ -216,23 +216,23 @@ export const createModelsStore = (sequelize: Sequelize.Sequelize) => {
   UserModel.hasOne(AuthorModel, getOptions('userId'));
   AuthorModel.belongsTo(UserModel, getOptions('userId'));
 
-  NewsDraftModel.hasOne(NewsModel, getOptions('draftId'));
-  NewsModel.belongsTo(NewsDraftModel, getOptions('draftId'));
+  DraftModel.hasOne(NewsModel, getOptions('draftId'));
+  NewsModel.belongsTo(DraftModel, getOptions('draftId'));
   // todo add mixins
   AuthorModel.hasMany(NewsModel, getOptions('authorId'));
   NewsModel.belongsTo(AuthorModel, getOptions('authorId'));
-  AuthorModel.hasMany(NewsDraftModel, getOptions('authorId'));
-  NewsDraftModel.belongsTo(AuthorModel, getOptions('authorId'));
+  AuthorModel.hasMany(DraftModel, getOptions('authorId'));
+  DraftModel.belongsTo(AuthorModel, getOptions('authorId'));
   // todo add mixins
   CategoryModel.hasMany(NewsModel, getOptions('categoryId'));
   NewsModel.belongsTo(CategoryModel, getOptions('categoryId'));
-  CategoryModel.hasMany(NewsDraftModel, getOptions('categoryId'));
-  NewsDraftModel.belongsTo(CategoryModel, getOptions('categoryId'));
+  CategoryModel.hasMany(DraftModel, getOptions('categoryId'));
+  DraftModel.belongsTo(CategoryModel, getOptions('categoryId'));
 
   TagModel.belongsToMany(NewsModel, { through: NewsTagModel });
   NewsModel.belongsToMany(TagModel, { through: NewsTagModel });
-  TagModel.belongsToMany(NewsDraftModel, { through: NewsDraftTagModel });
-  NewsDraftModel.belongsToMany(TagModel, { through: NewsDraftTagModel });
+  TagModel.belongsToMany(DraftModel, { through: DraftTagModel });
+  DraftModel.belongsToMany(TagModel, { through: DraftTagModel });
 
   UserModel.hasMany(CommentModel, getOptions('userId'));
   CommentModel.belongsTo(UserModel, getOptions('userId'));
@@ -241,14 +241,14 @@ export const createModelsStore = (sequelize: Sequelize.Sequelize) => {
 
   return {
     NewsModel,
-    NewsDraftModel,
+    DraftModel,
     AuthorModel,
     CommentModel,
     CategoryModel,
     TagModel,
     UserModel,
     NewsTagModel,
-    NewsDraftTagModel,
+    DraftTagModel,
   };
 };
 

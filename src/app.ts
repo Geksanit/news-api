@@ -13,6 +13,7 @@ import * as categories from './modules/categories';
 import * as users from './modules/users';
 import * as authors from './modules/authors';
 import * as news from './modules/news';
+import * as drafts from './modules/news/drafts';
 import * as comments from './modules/comments';
 import * as tags from './modules/tags';
 import { log } from './libs/log';
@@ -33,7 +34,12 @@ const app = express();
 app.use(
   cors({
     credentials: true,
-    origin: ['http://localhost:3000'],
+    origin: [
+      'https://localhost:3000',
+      'https://127.0.0.1:3000',
+      'http://localhost:3000',
+      'http://127.0.0.1:3000',
+    ],
   }),
 );
 app.use(bodyParser.json());
@@ -58,6 +64,7 @@ initializeAuth(app, sequelize);
 const modelsStore = createModelsStore(sequelize);
 
 app.use('/posts', news.makeRouter(sequelize, modelsStore));
+app.use('/drafts', drafts.makeRouter(sequelize, modelsStore));
 app.use('/comments', comments.makeRouter(modelsStore));
 app.use('/tags', tags.makeRouter(modelsStore));
 app.use('/categories', categories.makeRouter(modelsStore));

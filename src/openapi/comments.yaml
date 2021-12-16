@@ -4,6 +4,28 @@ info:
   description: Comments
   version: 1.0.0
 paths:
+  /comments/news/{id}:
+    get:
+      tags:
+        - Comments
+      summary: All comments by newsId
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: 
+            type: integer
+      responses:
+        200:
+          description: A list of comments.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "difinitions.yaml#/components/schemas/FullComment"
+        500:
+          description: Unexpected Error
   /comments/:
     get:
       tags:
@@ -24,7 +46,7 @@ paths:
           required: true
           schema:
             type: integer
-            example: 5
+            example: 20
           description: The numbers of items to return
       responses:
         200:

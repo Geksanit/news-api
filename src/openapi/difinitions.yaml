@@ -267,6 +267,16 @@ components:
         - topPhotoLink
         - photoLinks
 
+    FullComment:
+      allOf:
+        - $ref: '#/components/schemas/Comment'
+        - type: object
+          properties:
+            User: 
+              $ref: '#/components/schemas/UserView'
+          required:
+            - User
+
     Comment:
       allOf:
         - $ref: '#/components/schemas/CreateComment'

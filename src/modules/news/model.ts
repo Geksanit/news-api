@@ -25,11 +25,13 @@ export type TagFilter = {
   tags__all: number[] | undefined;
 };
 
-export const getTagFilter = (filter: TagFilter): string | null => {
-  if (filter.tag) return `:tag = ANY(${tagsIds})`;
-  if (filter.tags__in) return `ARRAY[:tags__in] && ARRAY(${tagsIds})`;
+export const getTagFilter = (filter: TagFilter, isDraft: boolean): string | null => {
+  if (filter.tag) return `:tag = ANY(${tagsIds(isDraft)})`;
+  if (filter.tags__in) return `ARRAY[:tags__in] && ARRAY(${tagsIds(isDraft)})`;
   if (filter.tags__all)
-    return `(ARRAY[:tags__all] @> ARRAY(${tagsIds})) AND (ARRAY[:tags__all] <@ ARRAY(${tagsIds}))`;
+    return `(ARRAY[:tags__all] @> ARRAY(${tagsIds(
+      isDraft,
+    )})) AND (ARRAY[:tags__all] <@ ARRAY(${tagsIds(isDraft)}))`;
   return null;
 };
 
@@ -41,7 +43,7 @@ export type Filters = {
   searchText: string | undefined;
 };
 
-export const getSearchTextFilter = (text: string | undefined) =>
+export const getSearchTextFilter = (text: string | undefined, isDraft: boolean) =>
   text
     ? `(
       n.content LIKE :searchTextLike OR
@@ -50,22 +52,22 @@ export const getSearchTextFilter = (text: string | undefined) =>
       :searchText = ANY(ARRAY(
         SELECT t.label
         FROM "Tags" as t
-        WHERE t.id = ANY(ARRAY(${tagsIds}))
+        WHERE t.id = ANY(ARRAY(${tagsIds(isDraft)}))
       ))
     )`
     : null;
 
-export const tagsToJSON = `
+export const tagsToJSON = (isDraft: boolean) => `
   SELECT json_build_object('id', t.id, 'label', t.label) as tag
-  FROM "NewsTags" as nt
+  FROM "${isDraft ? 'DraftTags' : 'NewsTags'}" as nt
   JOIN "Tags" as t ON t.id = nt."TagId"
-  WHERE nt."NewsId" = n.id
+  WHERE nt."${isDraft ? 'DraftId' : 'NewsId'}" = n.id
 `;
 
-export const tagsIds = `
+export const tagsIds = (isDraft: boolean) => `
   SELECT nt."TagId"
-  FROM "NewsTags" as nt
-  WHERE nt."NewsId" = n.id
+  FROM "${isDraft ? 'DraftTags' : 'NewsTags'}" as nt
+  WHERE nt."${isDraft ? 'DraftId' : 'NewsId'}" = n.id
 `;
 
 // old, not recursive query

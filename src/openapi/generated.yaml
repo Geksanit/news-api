@@ -24,7 +24,7 @@ paths:
           required: true
           schema:
             type: integer
-            example: 5
+            example: 20
           description: The numbers of items to return
       security:
         - cookieAuth: []
@@ -320,7 +320,7 @@ paths:
           required: true
           schema:
             type: integer
-            example: 5
+            example: 20
           description: The numbers of items to return
       responses:
         '200':
@@ -487,86 +487,7 @@ paths:
           description: Invalid request provided
         '500':
           description: Unexpected Error
-  /posts/raw/:
-    get:
-      tags:
-        - News
-      summary: All available news (available only for admins)
-      security:
-        - cookieAuth: []
-      parameters:
-        - in: query
-          name: offset
-          required: true
-          schema:
-            type: integer
-            example: 0
-          description: >-
-            The number of items to skip before starting to collect the result
-            set
-        - in: query
-          name: limit
-          required: true
-          schema:
-            type: integer
-            example: 5
-          description: The numbers of items to return
-      responses:
-        '200':
-          description: A list of news.
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  allOf:
-                    - type: object
-                      properties:
-                        title:
-                          type: string
-                        categoryId:
-                          type: number
-                        content:
-                          type: string
-                        topPhotoLink:
-                          type: string
-                        photoLinks:
-                          type: array
-                          uniqueItems: true
-                          minItems: 0
-                          maxItems: 10
-                          items:
-                            type: string
-                        tagIds:
-                          type: array
-                          uniqueItems: true
-                          minItems: 1
-                          maxItems: 10
-                          items:
-                            type: number
-                      required:
-                        - title
-                        - categoryId
-                        - tagsIds
-                        - content
-                        - topPhotoLink
-                        - photoLinks
-                    - type: object
-                      properties:
-                        id:
-                          type: integer
-                        createdAt:
-                          type: string
-                          format: date
-                          description: Creation date
-                          example: '2021-01-30'
-                        authorId:
-                          type: number
-                      required:
-                        - id
-                        - createdAt
-                        - authorId
-  /posts/:
+  /posts/full/:
     get:
       tags:
         - News
@@ -657,7 +578,7 @@ paths:
           required: true
           schema:
             type: integer
-            example: 5
+            example: 20
           description: The numbers of items to return
         - in: query
           name: offset
@@ -783,7 +704,86 @@ paths:
                     - content
                     - topPhotoLink
                     - photoLinks
-  '/posts/{id}':
+  /posts/:
+    get:
+      tags:
+        - News
+      summary: All available news
+      security:
+        - cookieAuth: []
+      parameters:
+        - in: query
+          name: offset
+          required: true
+          schema:
+            type: integer
+            example: 0
+          description: >-
+            The number of items to skip before starting to collect the result
+            set
+        - in: query
+          name: limit
+          required: true
+          schema:
+            type: integer
+            example: 20
+          description: The numbers of items to return
+      responses:
+        '200':
+          description: A list of news.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  allOf:
+                    - type: object
+                      properties:
+                        title:
+                          type: string
+                        categoryId:
+                          type: number
+                        content:
+                          type: string
+                        topPhotoLink:
+                          type: string
+                        photoLinks:
+                          type: array
+                          uniqueItems: true
+                          minItems: 0
+                          maxItems: 10
+                          items:
+                            type: string
+                        tagIds:
+                          type: array
+                          uniqueItems: true
+                          minItems: 1
+                          maxItems: 10
+                          items:
+                            type: number
+                      required:
+                        - title
+                        - categoryId
+                        - tagsIds
+                        - content
+                        - topPhotoLink
+                        - photoLinks
+                    - type: object
+                      properties:
+                        id:
+                          type: integer
+                        createdAt:
+                          type: string
+                          format: date
+                          description: Creation date
+                          example: '2021-01-30'
+                        authorId:
+                          type: number
+                      required:
+                        - id
+                        - createdAt
+                        - authorId
+  '/posts/full/{id}':
     get:
       tags:
         - News
@@ -908,11 +908,92 @@ paths:
                   - content
                   - topPhotoLink
                   - photoLinks
-  /posts/drafts/:
+  '/posts/{id}':
     get:
       tags:
         - News
-      summary: my drafts
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+            example: 1
+          description: Numeric ID of the news to get
+      responses:
+        '200':
+          description: One post.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - type: object
+                    properties:
+                      title:
+                        type: string
+                      categoryId:
+                        type: number
+                      content:
+                        type: string
+                      topPhotoLink:
+                        type: string
+                      photoLinks:
+                        type: array
+                        uniqueItems: true
+                        minItems: 0
+                        maxItems: 10
+                        items:
+                          type: string
+                      tagIds:
+                        type: array
+                        uniqueItems: true
+                        minItems: 1
+                        maxItems: 10
+                        items:
+                          type: number
+                    required:
+                      - title
+                      - categoryId
+                      - tagsIds
+                      - content
+                      - topPhotoLink
+                      - photoLinks
+                  - type: object
+                    properties:
+                      id:
+                        type: integer
+                      createdAt:
+                        type: string
+                        format: date
+                        description: Creation date
+                        example: '2021-01-30'
+                      authorId:
+                        type: number
+                    required:
+                      - id
+                      - createdAt
+                      - authorId
+    delete:
+      security:
+        - cookieAuth: []
+      tags:
+        - News
+      summary: Delete News (available only for admins)
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: News delete request
+      responses:
+        '200':
+          description: Successful operation
+  /drafts/full/:
+    get:
+      tags:
+        - Drafts
+      summary: my drafts (available only for author)
       security:
         - cookieAuth: []
       parameters:
@@ -930,11 +1011,150 @@ paths:
           required: true
           schema:
             type: integer
-            example: 5
+            example: 20
           description: The numbers of items to return
       responses:
         '200':
-          description: A list of news.
+          description: A list of drafts.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    title:
+                      type: string
+                    createdAt:
+                      type: string
+                      format: date
+                      description: Creation date
+                      example: '2021-01-30'
+                    author:
+                      allOf:
+                        - allOf:
+                            - type: object
+                              properties:
+                                username:
+                                  type: string
+                                firstName:
+                                  type: string
+                                lastName:
+                                  type: string
+                                avatarUrl:
+                                  type: string
+                              required:
+                                - username
+                                - firstName
+                                - lastName
+                                - avatarUrl
+                            - type: object
+                              properties:
+                                id:
+                                  type: integer
+                                isAdmin:
+                                  type: boolean
+                              required:
+                                - id
+                                - isAdmin
+                        - type: object
+                          properties:
+                            description:
+                              type: string
+                          required:
+                            - description
+                    category:
+                      type: array
+                      uniqueItems: true
+                      minItems: 1
+                      maxItems: 10
+                      items:
+                        allOf:
+                          - type: object
+                            properties:
+                              parentCategoryId:
+                                nullable: true
+                                type: integer
+                              label:
+                                type: string
+                            required:
+                              - label
+                              - parentCategoryId
+                          - type: object
+                            properties:
+                              id:
+                                type: integer
+                            required:
+                              - id
+                    tags:
+                      type: array
+                      uniqueItems: true
+                      minItems: 1
+                      maxItems: 10
+                      items:
+                        allOf:
+                          - type: object
+                            properties:
+                              label:
+                                type: string
+                            required:
+                              - label
+                          - type: object
+                            properties:
+                              id:
+                                type: integer
+                            required:
+                              - id
+                    content:
+                      type: string
+                    topPhotoLink:
+                      type: string
+                    photoLinks:
+                      type: array
+                      uniqueItems: true
+                      minItems: 0
+                      maxItems: 10
+                      items:
+                        type: string
+                  required:
+                    - id
+                    - title
+                    - createdAt
+                    - author
+                    - category
+                    - tags
+                    - content
+                    - topPhotoLink
+                    - photoLinks
+  /drafts/:
+    get:
+      tags:
+        - Drafts
+      summary: my drafts (available only for author)
+      security:
+        - cookieAuth: []
+      parameters:
+        - in: query
+          name: offset
+          required: true
+          schema:
+            type: integer
+            example: 0
+          description: >-
+            The number of items to skip before starting to collect the result
+            set
+        - in: query
+          name: limit
+          required: true
+          schema:
+            type: integer
+            example: 20
+          description: The numbers of items to return
+      responses:
+        '200':
+          description: A list of drafts.
           content:
             application/json:
               schema:
@@ -989,12 +1209,12 @@ paths:
                         - authorId
     post:
       tags:
-        - News
-      summary: Add a new News
+        - Drafts
+      summary: Add a new Draft (available only for author)
       security:
         - cookieAuth: []
       requestBody:
-        description: News create request
+        description: Draft create request
         content:
           application/json:
             schema:
@@ -1085,12 +1305,12 @@ paths:
                       - authorId
     patch:
       tags:
-        - News
-      summary: Update News
+        - Drafts
+      summary: Update Draft (available only for author)
       security:
         - cookieAuth: []
       requestBody:
-        description: News update request
+        description: Draft update request
         content:
           application/json:
             schema:
@@ -1145,40 +1365,308 @@ paths:
       responses:
         '200':
           description: Successful operation
-  '/posts/drafts/{id}':
+  '/drafts/full/{id}':
+    get:
+      tags:
+        - Drafts
+      summary: my draft (available only for author)
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+            example: 1
+          description: Numeric ID of the draft to get
+      responses:
+        '200':
+          description: One post.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  title:
+                    type: string
+                  createdAt:
+                    type: string
+                    format: date
+                    description: Creation date
+                    example: '2021-01-30'
+                  author:
+                    allOf:
+                      - allOf:
+                          - type: object
+                            properties:
+                              username:
+                                type: string
+                              firstName:
+                                type: string
+                              lastName:
+                                type: string
+                              avatarUrl:
+                                type: string
+                            required:
+                              - username
+                              - firstName
+                              - lastName
+                              - avatarUrl
+                          - type: object
+                            properties:
+                              id:
+                                type: integer
+                              isAdmin:
+                                type: boolean
+                            required:
+                              - id
+                              - isAdmin
+                      - type: object
+                        properties:
+                          description:
+                            type: string
+                        required:
+                          - description
+                  category:
+                    type: array
+                    uniqueItems: true
+                    minItems: 1
+                    maxItems: 10
+                    items:
+                      allOf:
+                        - type: object
+                          properties:
+                            parentCategoryId:
+                              nullable: true
+                              type: integer
+                            label:
+                              type: string
+                          required:
+                            - label
+                            - parentCategoryId
+                        - type: object
+                          properties:
+                            id:
+                              type: integer
+                          required:
+                            - id
+                  tags:
+                    type: array
+                    uniqueItems: true
+                    minItems: 1
+                    maxItems: 10
+                    items:
+                      allOf:
+                        - type: object
+                          properties:
+                            label:
+                              type: string
+                          required:
+                            - label
+                        - type: object
+                          properties:
+                            id:
+                              type: integer
+                          required:
+                            - id
+                  content:
+                    type: string
+                  topPhotoLink:
+                    type: string
+                  photoLinks:
+                    type: array
+                    uniqueItems: true
+                    minItems: 0
+                    maxItems: 10
+                    items:
+                      type: string
+                required:
+                  - id
+                  - title
+                  - createdAt
+                  - author
+                  - category
+                  - tags
+                  - content
+                  - topPhotoLink
+                  - photoLinks
+  '/drafts/{id}':
+    get:
+      tags:
+        - Drafts
+      summary: my draft (available only for author)
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+            example: 1
+          description: Numeric ID of the draft to get
+      responses:
+        '200':
+          description: One post.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - type: object
+                    properties:
+                      title:
+                        type: string
+                      categoryId:
+                        type: number
+                      content:
+                        type: string
+                      topPhotoLink:
+                        type: string
+                      photoLinks:
+                        type: array
+                        uniqueItems: true
+                        minItems: 0
+                        maxItems: 10
+                        items:
+                          type: string
+                      tagIds:
+                        type: array
+                        uniqueItems: true
+                        minItems: 1
+                        maxItems: 10
+                        items:
+                          type: number
+                    required:
+                      - title
+                      - categoryId
+                      - tagsIds
+                      - content
+                      - topPhotoLink
+                      - photoLinks
+                  - type: object
+                    properties:
+                      id:
+                        type: integer
+                      createdAt:
+                        type: string
+                        format: date
+                        description: Creation date
+                        example: '2021-01-30'
+                      authorId:
+                        type: number
+                    required:
+                      - id
+                      - createdAt
+                      - authorId
     delete:
       security:
         - cookieAuth: []
       tags:
-        - News
-      summary: Delete News (available only for admins)
+        - Drafts
+      summary: Delete Draft (available only for admins)
       parameters:
         - in: path
           name: id
           required: true
           schema:
             type: integer
-          description: News delete request
+          description: Draft delete request
       responses:
         '200':
           description: Successful operation
-  '/posts/drafts/publish/{id}':
+  '/drafts/publish/{id}':
     get:
       security:
         - cookieAuth: []
       tags:
-        - News
-      summary: publish News (available only for author)
+        - Drafts
+      summary: publish Draft (available only for author)
       parameters:
         - in: path
           name: id
           required: true
           schema:
             type: integer
-          description: News publish request
+          description: Draft publish request
       responses:
         '200':
           description: Successful operation
+  '/comments/news/{id}':
+    get:
+      tags:
+        - Comments
+      summary: All comments by newsId
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: A list of comments.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  allOf:
+                    - allOf:
+                        - type: object
+                          properties:
+                            newsId:
+                              type: number
+                            content:
+                              type: string
+                          required:
+                            - newsId
+                            - content
+                        - type: object
+                          properties:
+                            id:
+                              type: integer
+                            userId:
+                              type: number
+                            createdAt:
+                              type: string
+                              format: date
+                              description: Creation date
+                              example: '2021-01-30'
+                          required:
+                            - id
+                            - userId
+                            - createdAt
+                    - type: object
+                      properties:
+                        User:
+                          allOf:
+                            - type: object
+                              properties:
+                                username:
+                                  type: string
+                                firstName:
+                                  type: string
+                                lastName:
+                                  type: string
+                                avatarUrl:
+                                  type: string
+                              required:
+                                - username
+                                - firstName
+                                - lastName
+                                - avatarUrl
+                            - type: object
+                              properties:
+                                id:
+                                  type: integer
+                                isAdmin:
+                                  type: boolean
+                              required:
+                                - id
+                                - isAdmin
+                      required:
+                        - User
+        '500':
+          description: Unexpected Error
   /comments/:
     get:
       tags:
@@ -1201,7 +1689,7 @@ paths:
           required: true
           schema:
             type: integer
-            example: 5
+            example: 20
           description: The numbers of items to return
       responses:
         '200':
@@ -1379,7 +1867,7 @@ paths:
           required: true
           schema:
             type: integer
-            example: 5
+            example: 20
           description: The numbers of items to return
       responses:
         '200':
@@ -1534,7 +2022,7 @@ paths:
           required: true
           schema:
             type: integer
-            example: 5
+            example: 20
           description: The numbers of items to return
       responses:
         '200':

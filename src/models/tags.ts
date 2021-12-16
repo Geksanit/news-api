@@ -28,31 +28,34 @@ export const getTagFromInstance = ({ label, id }: TagInstance): Tag => ({
 
 export const initialTags: CreateTag[] = [
   {
-    label: 'politics',
+    label: 'технологии',
   },
   {
-    label: 'business',
+    label: 'происшествие', // 2
   },
   {
-    label: 'memes',
+    label: 'мемы',
   },
   {
-    label: 'new',
+    label: 'транспорт', // 4
   },
   {
-    label: 'repost',
+    label: 'репост',
   },
   {
-    label: 'football',
+    label: 'маркетинг', // 6
   },
   {
-    label: 'media',
+    label: 'будущее',
   },
   {
-    label: 'F1',
+    label: 'рассказы', // 8
   },
   {
-    label: 'auto',
+    label: 'интервью',
+  },
+  {
+    label: 'перевод', // 10
   },
 ];
 

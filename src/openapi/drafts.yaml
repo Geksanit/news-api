@@ -1,0 +1,184 @@
+openapi: 3.0.1
+info:
+  title: NewSite Rest API
+  description: Drafts
+  version: 1.0.0
+paths:
+              
+  /drafts/full/:
+    get:
+      tags:
+        - Drafts
+      summary: my drafts (available only for author)
+      security:
+        - cookieAuth: []
+      parameters:
+        - in: query
+          name: offset
+          required: true
+          schema:
+            type: integer
+            example: 0
+          description: The number of items to skip before starting to collect the result set
+        - in: query
+          name: limit
+          required: true
+          schema:
+            type: integer
+            example: 20
+          description: The numbers of items to return
+      responses:
+        200:
+          description: A list of drafts.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "difinitions.yaml#/components/schemas/FullNews"
+                
+  /drafts/:
+    get:
+      tags:
+        - Drafts
+      summary: my drafts (available only for author)
+      security:
+        - cookieAuth: []
+      parameters:
+        - in: query
+          name: offset
+          required: true
+          schema:
+            type: integer
+            example: 0
+          description: The number of items to skip before starting to collect the result set
+        - in: query
+          name: limit
+          required: true
+          schema:
+            type: integer
+            example: 20
+          description: The numbers of items to return
+      responses:
+        200:
+          description: A list of drafts.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "difinitions.yaml#/components/schemas/News"
+
+    post:
+      tags:
+        - Drafts
+      summary: Add a new Draft (available only for author)
+      security:
+        - cookieAuth: []
+      requestBody:
+        description: Draft create request
+        content:
+          application/json:
+            schema:
+              $ref: "difinitions.yaml#/components/schemas/CreateNews"
+        required: true
+      responses:
+        201:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "difinitions.yaml#/components/schemas/News"
+
+    patch:
+      tags:
+        - Drafts
+      summary: Update Draft (available only for author)
+      security:
+        - cookieAuth: []
+      requestBody:
+        description: Draft update request
+        content:
+          application/json:
+            schema:
+              $ref: "difinitions.yaml#/components/schemas/News"
+        required: true
+      responses:
+        200:
+          description: Successful operation
+
+  /drafts/full/{id}:
+    get:
+      tags:
+        - Drafts
+      summary: my draft (available only for author)
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+            example: 1
+          description: Numeric ID of the draft to get
+      responses:
+        200:
+          description: One post.
+          content:
+            application/json:
+              schema:
+               $ref: "difinitions.yaml#/components/schemas/FullNews"
+  /drafts/{id}:
+    get:
+      tags:
+        - Drafts
+      summary: my draft (available only for author)
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+            example: 1
+          description: Numeric ID of the draft to get
+      responses:
+        200:
+          description: One post.
+          content:
+            application/json:
+              schema:
+               $ref: "difinitions.yaml#/components/schemas/News"
+
+    delete:
+      security:
+        - cookieAuth: []
+      tags:
+        - Drafts
+      summary: Delete Draft (available only for admins)
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: 
+            type: integer
+          description: Draft delete request
+      responses:
+        200:
+          description: Successful operation
+
+  /drafts/publish/{id}:
+    get:
+      security:
+        - cookieAuth: []
+      tags:
+        - Drafts
+      summary: publish Draft (available only for author)
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: 
+            type: integer
+          description: Draft publish request
+      responses:
+        200:
+          description: Successful operation

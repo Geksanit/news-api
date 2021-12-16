@@ -24,7 +24,7 @@ paths:
           required: true
           schema:
             type: integer
-            example: 5
+            example: 20
           description: The numbers of items to return
       responses:
         200:

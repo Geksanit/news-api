@@ -27,27 +27,8 @@ const script = async () => {
   }
   try {
     const store = createModelsStore(sequelize);
-    const {
-      AuthorModel,
-      UserModel,
-      NewsModel,
-      NewsDraftModel,
-      CommentModel,
-      TagModel,
-      CategoryModel,
-      NewsDraftTagModel,
-      NewsTagModel,
-    } = store;
 
-    await CommentModel.drop();
-    await NewsTagModel.drop();
-    await NewsDraftTagModel.drop();
-    await NewsModel.drop();
-    await NewsDraftModel.drop();
-    await AuthorModel.drop();
-    await UserModel.drop();
-    await CategoryModel.drop();
-    await TagModel.drop();
+    await sequelize.drop({ cascade: true });
 
     await initTagData(sequelize, store);
     await initCategoryData(sequelize, store);

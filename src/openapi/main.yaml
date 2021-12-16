@@ -16,18 +16,26 @@ paths:
     $ref: 'authors.yaml#/paths/~1authors~1'
   /authors/{id}:
     $ref: 'authors.yaml#/paths/~1authors~1{id}'
-  /posts/raw/:
-    $ref: 'news.yaml#/paths/~1posts~1raw~1'
+  /posts/full/:
+    $ref: 'news.yaml#/paths/~1posts~1full~1'
   /posts/:
     $ref: 'news.yaml#/paths/~1posts~1'
+  /posts/full/{id}:
+    $ref: 'news.yaml#/paths/~1posts~1full~1{id}'
   /posts/{id}:
     $ref: 'news.yaml#/paths/~1posts~1{id}'
-  /posts/drafts/:
-    $ref: 'news.yaml#/paths/~1posts~1drafts~1'
-  /posts/drafts/{id}:
-    $ref: 'news.yaml#/paths/~1posts~1drafts~1{id}'
-  /posts/drafts/publish/{id}:
-      $ref: 'news.yaml#/paths/~1posts~1drafts~1publish~1{id}'
+  /drafts/full/:
+    $ref: 'drafts.yaml#/paths/~1drafts~1full~1'
+  /drafts/:
+    $ref: 'drafts.yaml#/paths/~1drafts~1'
+  /drafts/full/{id}:
+    $ref: 'drafts.yaml#/paths/~1drafts~1full~1{id}'
+  /drafts/{id}:
+    $ref: 'drafts.yaml#/paths/~1drafts~1{id}'
+  /drafts/publish/{id}:
+      $ref: 'drafts.yaml#/paths/~1drafts~1publish~1{id}'
+  /comments/news/{id}:
+    $ref: 'comments.yaml#/paths/~1comments~1news~1{id}'
   /comments/:
     $ref: 'comments.yaml#/paths/~1comments~1'
   /comments/{id}:

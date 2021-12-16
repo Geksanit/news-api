@@ -1,13 +1,19 @@
+/* eslint-disable no-restricted-syntax */
+
+/* eslint-disable no-await-in-loop */
 import { pick } from 'ramda';
 import { Sequelize, Model, DataTypes } from 'sequelize';
 import { News, CreateNews } from 'src/types/generated';
 
+import { getTimeout } from '../utils/Promise';
 import { ModelsStore } from './models.store';
 import { createTagModel, TagInstance } from './tags';
 
 export interface NewsInstance extends Model<News, CreateNews & { authorId: number }>, News {}
 export type NewsTags = { NewsId: number; TagId: number };
 export interface NewsTagsInstance extends Model<NewsTags, NewsTags>, NewsTags {}
+export type DraftTags = { DraftId: number; TagId: number };
+export interface DraftTagsInstance extends Model<DraftTags, DraftTags>, DraftTags {}
 export type NewsAttributes = News;
 
 const attributers = {
@@ -42,8 +48,8 @@ const attributers = {
 export const createNewsModel = <Instance extends NewsInstance>(sequalize: Sequelize) =>
   sequalize.define<Instance, NewsAttributes>('News', attributers);
 
-export const createNewsDraftModel = <Instance extends NewsInstance>(sequalize: Sequelize) =>
-  sequalize.define<Instance, NewsAttributes>('NewsDraft', attributers);
+export const createDraftModel = <Instance extends NewsInstance>(sequalize: Sequelize) =>
+  sequalize.define<Instance, NewsAttributes>('Draft', attributers);
 
 export const createNewsTagsModel = <Instance extends NewsTagsInstance>(
   sequalize: Sequelize,
@@ -67,16 +73,16 @@ export const createNewsTagsModel = <Instance extends NewsTagsInstance>(
     },
   });
 
-export const createNewsDraftTagsModel = <Instance extends NewsTagsInstance>(
+export const createDraftTagsModel = <Instance extends DraftTagsInstance>(
   sequalize: Sequelize,
-  NewsDraftModel: ReturnType<typeof createNewsDraftModel>,
+  DraftModel: ReturnType<typeof createDraftModel>,
   TagModel: ReturnType<typeof createTagModel>,
 ) =>
-  sequalize.define<Instance, NewsTags>('NewsDraftTags', {
-    NewsId: {
+  sequalize.define<Instance, DraftTags>('DraftTags', {
+    DraftId: {
       type: DataTypes.INTEGER,
       references: {
-        model: NewsDraftModel,
+        model: DraftModel,
         key: 'id',
       },
     },
@@ -114,16 +120,20 @@ export const createNewsToModel = ({
 
 export const initNewsData = async (
   seq: Sequelize,
-  { NewsModel, NewsDraftModel, TagModel, NewsTagModel, NewsDraftTagModel }: ModelsStore,
+  { NewsModel, DraftModel, TagModel, NewsTagModel, DraftTagModel }: ModelsStore,
 ) => {
-  await NewsDraftModel.sync({ force: true });
+  await DraftModel.sync({ force: true });
   await NewsModel.sync({ force: true });
-  await NewsDraftTagModel.sync({ force: true });
+  await DraftTagModel.sync({ force: true });
   await NewsTagModel.sync({ force: true });
 
-  const promises = initialData.map(async ({ isPublished, tagsIds, ...data }) => {
+  for (const d of initialData) {
+    const { isPublished, tagsIds, ...data } = d;
+    // eslint-disable-next-line no-console
+    console.log('timeout 1000');
+    await getTimeout(1000);
     const value = createNewsToModel(data);
-    const draftInstance = await NewsDraftModel.create(value);
+    const draftInstance = await DraftModel.create(value);
     const tagsA = await Promise.all(
       tagsIds.map(tagId => TagModel.findOne({ where: { id: tagId } })),
     );
@@ -133,8 +143,7 @@ export const initNewsData = async (
       const newsInstance = await draftInstance.createNews(value);
       await newsInstance.addTags(tags);
     }
-  });
-  return Promise.all(promises);
+  }
 };
 
 export const initialData: Array<
@@ -143,7 +152,7 @@ export const initialData: Array<
   {
     title: 'Грузовик с томатным пюре разбивается, дорога становится красной',
     categoryId: 1,
-    tagsIds: [1, 2],
+    tagsIds: [2, 4],
     content: `На этой неделе в Англии разбился грузовик, груженый томатным пюре, в результате чего шоссе стало красным, что вызвало ряд каламбурных слов, связанных с едой, со стороны людей в социальных сетях.
     Автомобиль попал в аварию с другим грузовиком в Кембриджшире, восточная Англия, во вторник, сообщили CNN в Highways England.
     Управление государственных автомагистралей заявило, что автомобиль «потерял груз и повредил проезжую часть», что привело к перекрытию дороги на A14.
@@ -158,8 +167,8 @@ export const initialData: Array<
   {
     title:
       'Новая Зеландия находится в стороне от Китая на пять глаз. Возможно, придется выбрать сторону',
-    categoryId: 1,
-    tagsIds: [1, 2],
+    categoryId: 2,
+    tagsIds: [10],
     content: `«Может быть, Новая Зеландия превращается в ... Новую Землю Кси?» - спросил зловещий голос.
     Это было частью превью зажигательного сегмента австралийского телешоу "60 минут", основанного на идее о том, что Новая Зеландия так отчаянно пытается удержать Китай, своего крупнейшего торгового партнера, в стороне, что отбросила как свою мораль, так и дружбу с Канберра.`,
     topPhotoLink:
@@ -169,11 +178,12 @@ export const initialData: Array<
     authorId: 2,
   },
   {
-    title: 'Моя супер новость',
+    title: 'Солнечный зонд Parker совершает исторический проход сквозь атмосферу Солнца',
     categoryId: 1,
-    tagsIds: [2],
-    content: `bla bla bla`,
-    topPhotoLink: 'https://google.com/xaxaxa.jpg',
+    tagsIds: [1],
+    content: `Американское космическое агентство (НАСА) называет это историческим моментом - первый раз космический корабль пролетел через внешнюю атмосферу Солнца.`,
+    topPhotoLink:
+      'https://ichef.bbci.co.uk/news/976/cpsprodpb/A12D/production/_102816214_observingsunposter-jhu-apl.jpg',
     photoLinks: ['photo1', 'photo2', 'photo3', 'photo4', 'photo5'],
     authorId: 1,
     isPublished: true,
@@ -183,7 +193,8 @@ export const initialData: Array<
     categoryId: 1,
     tagsIds: [1, 2],
     content: `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut facilisis risus feugiat, feugiat augue et, euismod libero. Duis eget arcu iaculis, commodo sem quis, faucibus lacus. Nulla sollicitudin nulla vel finibus semper. Vestibulum placerat velit urna, ac egestas massa posuere sed. Vestibulum eu quam est. Proin magna quam, ultricies sed neque volutpat, dapibus cursus leo. Vestibulum lectus ipsum, euismod eu quam vitae, scelerisque laoreet nibh. Maecenas erat justo, consectetur ut euismod eu, pretium id turpis.`,
-    topPhotoLink: '',
+    topPhotoLink:
+      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQk9Vd-AuBS0FJi6i3l6SvCHPRByX7aGtFusw&usqp=CAU',
     photoLinks: [],
     authorId: 2,
     isPublished: false,
@@ -194,26 +205,29 @@ export const initialData: Array<
     categoryId: 1,
     tagsIds: [1, 2],
     content: `Donec commodo quis augue vel maximus. Maecenas nunc elit, porttitor a nunc sit amet, sollicitudin tincidunt nisl. Nullam gravida felis in suscipit faucibus. Duis elementum ipsum et molestie gravida. Morbi aliquam justo nec sagittis volutpat. Donec et condimentum diam. Quisque pellentesque felis vitae elit laoreet, varius vestibulum purus dignissim.`,
-    topPhotoLink: '',
+    topPhotoLink:
+      'https://assets.anantara.com/image/upload/q_auto,f_auto/media/minor/anantara/images/anantara-mui-ne-resort/experiences/phan-thiet-explorer-tour/anantara_mui_ne_phanthiet_intro_944x510.jpg',
     photoLinks: ['photo1', 'photo2'],
     authorId: 1,
-    isPublished: true,
+    isPublished: false,
   },
   {
-    title: `Гран-при Азербайджана: Серхио Перес победил после крушения Макса Ферстаппена на высокой скорости`,
-    categoryId: 6,
-    tagsIds: [5, 4],
-    content: `Duis pharetra vestibulum felis, non posuere lorem placerat iaculis. Maecenas hendrerit commodo dapibus. Integer sapien erat, efficitur convallis auctor et, pellentesque at turpis. Sed hendrerit ante nisi, et mattis odio pellentesque nec. Aenean purus arcu, posuere id porttitor sagittis, tristique quis ante. Duis a laoreet neque. Proin a urna semper, molestie mi vitae, tristique velit. Proin non blandit sem.`,
+    title: `Перес выиграл Гран-при Азербайджана, Ферстаппен в роли лидера разбил болид за несколько кругов до финиша`,
+    categoryId: 7,
+    tagsIds: [4, 5, 9],
+    content: `Пилот «Ред Булл» Серхио Перес стал победителем Гран-при Азербайджана благодаря аварии своего напарника по команде Макса Ферстаппена.`,
     topPhotoLink:
+      'https://s-cdn.sportbox.ru/images/styles/690_388/fp_fotos/51/1a/52dd152d8bb104d0de230c773bee064660bdb0d12ed5b104016824.jpg',
+    photoLinks: [
       'https://ichef.bbci.co.uk/onesport/cps/800/cpsprodpb/765E/production/_118820303_baku.jpg',
-    photoLinks: [''],
+    ],
     authorId: 1,
     isPublished: true,
   },
   {
     title:
       'Нападающий «Барселоны» Мартин Брейтуэйт забил, когда Дания обыграла Боснию и Герцеговину в финальном матче разминки перед Евро-2020.',
-    categoryId: 4,
+    categoryId: 5,
     tagsIds: [6],
     content: `Donec volutpat, mi in porta efficitur, mi quam sodales augue, sit amet suscipit nunc felis ac urna. Nunc eu lorem eu purus ultrices viverra. Maecenas quis sagittis ex, in maximus nulla. Curabitur quis orci egestas, sodales enim et, auctor eros. Donec faucibus sem id ultrices iaculis. Aliquam metus leo, consequat in erat nec, aliquam tristique nisl. Ut venenatis, mi eget vulputate semper, erat odio rhoncus purus, vel volutpat ligula eros vel ligula. Duis ac dictum erat. Pellentesque nec nisl nec ante ullamcorper pellentesque non eu urna. Nam ultricies convallis metus, id consequat augue dictum consectetur.`,
     topPhotoLink:
@@ -227,29 +241,33 @@ export const initialData: Array<
     title: '6 простых способов сделать свои собственные мемы',
     categoryId: 1,
     tagsIds: [3],
-    content: `Integer quis metus a est sodales congue eu a ipsum. Vestibulum hendrerit, ligula sed pulvinar lobortis, lectus felis aliquet mi, vel iaculis magna quam quis ante. Quisque at molestie odio, vitae efficitur libero. Phasellus ut molestie urna, eget sollicitudin quam. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Quisque urna metus, vestibulum id lectus lobortis, facilisis placerat eros. Pellentesque interdum vel nibh ut fermentum. Sed euismod interdum ligula, ac facilisis nulla blandit at. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Curabitur tristique volutpat pretium. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.`,
+    content: `Лучшие мемы забавны, используются в нужное время и говорят правильные вещи. Их легко найти в Интернете, но иногда лучшие из них — это те, которые вы делаете, идеально подходящие на данный момент. Они могут быть мучительно неудобными, но могут быть и очень и очень забавными. Если вас внезапно поразило комическое вдохновение, хорошая новость заключается в том, что эти мемы действительно легко создать: вам не нужно много художественного таланта или навыков графического дизайна, просто хорошая идея (и удачное время.) Независимо от того, используете ли вы свой компьютер или телефон, вот приложения и инструменты, необходимые для создания мемов. Canva Canva обладает множеством функций, но проста в использовании. Canva через Дэвида Нильда Canva предлагает множество полезных инструментов графического дизайна для всех, от новичков до профессионалов отрасли, и даже есть встроенный генератор мемов, как хорошо. Щелкните Create a New Meme и все готово, хотя вам придется зарегистрировать бесплатную учетную запись, если вы хотите сохранить и экспортировать свой дизайн. Вы получите удобный Вкладка Шаблоны если вы хотите адаптировать существующий мем, или вы можете переключиться на Загрузки чтобы выбрать собственное изображение. Используйте инструмент Текст чтобы поместить несколько слов поверх выбранного изображения: Canva предлагает множество различных вариантов шрифта, эффектов, цвета и размера текста, и это один из лучших вариантов. для полного контроля над тем, как выглядит ваш мем. Canva также доступна для Android и iOS.
+    Источник: https://artforlife.ru/prochie-tematiki/6-prostyh-sposobov-sdelat-svoi-sobstvennye-memy.html © https://artforlife.ru/`,
     topPhotoLink: '',
     photoLinks: [''],
     authorId: 1,
     isPublished: true,
   },
   {
-    title: 'Формула 1 в финале школьного мира будет показана в прямом эфире на Motorsport.tv',
-    categoryId: 6,
-    tagsIds: [4, 8],
-    content: `F1 в школах, созданный в 1999 году, с момента своего создания приветствовал тысячи школ, которые присоединились к конкурсу - на данный момент охватил более 52 стран - и направлен на то, чтобы вдохновить детей познавать науку, технологии, инженерию и математику с помощью F1.`,
-    topPhotoLink: '',
+    title: 'Мировой финал «Ф1 в школах» покажет в прямом эфире Motorsport.tv',
+    categoryId: 7,
+    tagsIds: [6, 7],
+    content: `Лондон, 4 июня 2021 года: Мировой финал программы «Ф1 в школах» будет показан в прямом эфире на новом канале, посвященном этой инициативе на Motorsport.tv – специализированной платформе сети Motorsport Network, охватывающей международную аудиторию.
+
+    «Ф1 в школах», используя захватывающий образ Формулы 1, вдохновляет детей изучать науку, технологии, инженерное дело и математические предметы, чтобы затем делать карьеру в этих областях. `,
+    topPhotoLink:
+      'https://cdn-1.motorsport.com/images/amp/YXR9ONx0/s1000/f1-in-schools-world-final-to-b.webp',
     photoLinks: [''],
     authorId: 1,
     isPublished: true,
   },
   {
-    title: `Неожиданное возвращение Кляйншмидта в гонки с CUPRA`,
+    title: `Кристофферссон вновь стал чемпионом мира по ралли-кроссу`,
     categoryId: 7,
     tagsIds: [4, 8],
-    content: `Integer quis metus a est sodales congue eu a ipsum. Vestibulum hendrerit, ligula sed pulvinar lobortis, lectus felis aliquet mi, vel iaculis magna quam quis ante. Quisque at molestie odio, vitae efficitur libero. Phasellus ut molestie urna, eget sollicitudin quam. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Quisque urna metus, vestibulum id lectus lobortis, facilisis placerat eros. Pellentesque interdum vel nibh ut fermentum. Sed euismod interdum ligula, ac facilisis nulla blandit at. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Curabitur tristique volutpat pretium. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.`,
+    content: `Йохан Кристофферсон завоевал четвертый титул чемпиона мира по ралли-кроссу после двух этапов в один уик-энд на Нюрбургринге. Он выиграл в первый день и стал вторым во второй, так что благодаря заработанным за уик-энд очкам смог выйти в лидеры.`,
     topPhotoLink:
-      'https://cdn-2.motorsport.com/images/mgl/24v8gOd6/s8/jutta-kleinschmidt-mattias-eks-1.jpg',
+      'https://cdn-1.motorsport.com/images/amp/0k7DvAV0/s1000/podium-johan-kristoffersson-ky.webp',
     photoLinks: [''],
     authorId: 1,
     isPublished: true,

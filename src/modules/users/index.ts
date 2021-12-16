@@ -29,8 +29,13 @@ export const makeRouter = ({ UserModel }: ModelsStore) => {
         await UserModel.update({ tokenCounter }, { where: { id } });
         const token = getToken({ userId: id, counter: tokenCounter });
 
-        res.cookie('jwt', token, { maxAge: 90000000, httpOnly: true });
-        res.send({ user: getUserViewFromInstance(instance) });
+        res.cookie('jwt', token, {
+          maxAge: 90000000,
+          httpOnly: true,
+          secure: true,
+          sameSite: 'none',
+        });
+        res.send(getUserViewFromInstance(instance));
       } catch (error) {
         next(error);
       }

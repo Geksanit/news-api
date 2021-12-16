@@ -29,7 +29,7 @@ export const makeRouter = ({ CategoryModel }: ModelsStore) => {
       const parentCategory = await CategoryModel.findOne({
         where: { id: req.body.parentCategoryId },
       });
-      if (!parentCategory) {
+      if (req.body.parentCategoryId !== null && !parentCategory) {
         throw new HttpError(400, 'not found parent category');
       }
       const instance = await CategoryModel.create(req.body);

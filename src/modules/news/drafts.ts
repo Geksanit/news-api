@@ -4,9 +4,9 @@ import { Sequelize, QueryTypes } from 'sequelize';
 
 import { HttpError } from '../../utils/Errors';
 import { createLogger } from '../../middlewares/logger';
-import { getNewsFromInstance, newsAttributes } from '../../models/news';
-import { authenticateAdmin } from '../../middlewares/authenticate';
-import { Pagination } from '../../types/generated';
+import { createNewsToModel, getNewsFromInstance, newsAttributes } from '../../models/news';
+import { authenticateAdmin, authenticateUser } from '../../middlewares/authenticate';
+import { CreateNews, News, Pagination, UserView } from '../../types/generated';
 import {
   authorToJSON,
   categoryToJSON,
@@ -16,26 +16,27 @@ import {
   getOrder,
   getSearchTextFilter,
   getTagFilter,
-  tagsToJSON,
   TagFilter,
+  tagsToJSON,
 } from './model';
 import { ModelsStore } from '../../models/models.store';
 
 export const makeRouter = (sequelize: Sequelize, modelsStore: ModelsStore) => {
-  const { NewsModel } = modelsStore;
+  const { AuthorModel, DraftModel } = modelsStore;
   const router = express.Router();
   router.use(createLogger(module));
 
-  router.get('/full/', async (req, res, next) => {
+  router.get('/full/', authenticateUser, async (req, res, next) => {
     try {
+      const user = req.user as UserView;
+      const author = await AuthorModel.findOne({
+        where: { id: user.id },
+      });
+      if (!author) {
+        throw new HttpError(400, 'author not found');
+      }
       const { limit, offset } = (req.query as unknown) as Pagination;
-      const {
-        categoryId,
-        title,
-        content,
-        authorName,
-        searchText,
-      } = (req.query as unknown) as Filters;
+      const { categoryId, title, content, searchText } = (req.query as unknown) as Filters;
       const { tag, tags__in, tags__all } = (req.query as unknown) as TagFilter;
       const {
         created_at,
@@ -44,11 +45,10 @@ export const makeRouter = (sequelize: Sequelize, modelsStore: ModelsStore) => {
       } = (req.query as unknown) as CreatedAtFilter;
       const stringifiedOrder = getOrder(req.query);
       const stringifiedFilters = [
-        'True',
-        getTagFilter({ tag, tags__in, tags__all }, false),
+        `:authorId = n."authorId"`,
+        getTagFilter({ tag, tags__in, tags__all }, true),
         getCreatedAtFilter({ created_at, created_at__lt, created_at__gt }),
-        getSearchTextFilter(searchText, false),
-        authorName ? `:authorName = u."firstName"` : null,
+        getSearchTextFilter(searchText, true),
         categoryId ? `:categoryId = n."categoryId"` : null,
         title ? `n.title LIKE :title` : null,
         content ? `n.content LIKE :content` : null,
@@ -58,10 +58,10 @@ export const makeRouter = (sequelize: Sequelize, modelsStore: ModelsStore) => {
       const fullNews = await sequelize.query(
         `
           SELECT n.id, (${authorToJSON}) as author, ARRAY(${categoryToJSON}) as category, ARRAY(${tagsToJSON(
-          false,
+          true,
         )}) as tags,
             n."createdAt", n.title, n.content, n."topPhotoLink", n."photoLinks"
-          FROM "News" as n
+          FROM "Drafts" as n
           JOIN "Authors" as a ON a.id = n."authorId"
           JOIN "Users" as u ON a.id = u.id
           JOIN "Categories" as c ON c.id = n."categoryId"
@@ -74,7 +74,7 @@ export const makeRouter = (sequelize: Sequelize, modelsStore: ModelsStore) => {
           replacements: {
             limit,
             offset,
-            authorName,
+            authorId: author?.id,
             categoryId,
             title: `%${title}%`,
             content: `%${content}%`,
@@ -97,13 +97,45 @@ export const makeRouter = (sequelize: Sequelize, modelsStore: ModelsStore) => {
     }
   });
 
-  router.get('/', async (req, res, next) => {
+  router.get('/publish/:id', authenticateAdmin, async (req, res, next) => {
     try {
+      const {
+        params: { id },
+      } = req;
+      const draft = await DraftModel.findOne({
+        where: { id },
+      });
+      if (!draft) {
+        throw new HttpError(400, 'not found draft');
+      }
+      const tags = await draft.getTags();
+      const news = await draft.getNews();
+      if (news) {
+        await news.update(getNewsFromInstance(draft));
+        const oldTags = await news.getTags();
+        await news.removeTags(oldTags);
+        await news.addTags(tags);
+      } else {
+        const newNews = await draft.createNews(getNewsFromInstance(draft));
+        await newNews.addTags(tags);
+      }
+      res.status(201);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  router.get('/', authenticateUser, async (req, res, next) => {
+    try {
+      const user = req.user as UserView;
       const { limit, offset } = (req.query as unknown) as Pagination;
-      const news = await NewsModel.findAll({
+      const news = await DraftModel.findAll({
         limit,
         offset,
         attributes: newsAttributes,
+        where: {
+          authorId: user.id,
+        },
         order: sequelize.Sequelize.col('id'),
       });
       res.json(news.map(getNewsFromInstance));
@@ -111,20 +143,54 @@ export const makeRouter = (sequelize: Sequelize, modelsStore: ModelsStore) => {
       next(error);
     }
   });
-
+  router.post('/', authenticateUser, async (req, res, next) => {
+    try {
+      const user = req.user as UserView;
+      const news = req.body as CreateNews;
+      const author = await AuthorModel.findOne({ where: { userId: user.id } });
+      if (!author) {
+        throw new HttpError(400, 'user is not author');
+      }
+      const instance = await DraftModel.create(createNewsToModel({ ...news, authorId: user.id }));
+      res.status(201).send(getNewsFromInstance(instance));
+    } catch (error) {
+      next(error);
+    }
+  });
+  router.patch('/', authenticateUser, async (req, res, next) => {
+    try {
+      const user = req.user as UserView;
+      const updatedNews = req.body as News;
+      const author = await AuthorModel.findOne({ where: { userId: user.id } });
+      if (!author) {
+        throw new HttpError(400, 'user is not author');
+      }
+      const news = await DraftModel.findOne({ where: { id: updatedNews } });
+      if (!news || user.id !== news.authorId) {
+        throw new HttpError(400, 'not found draft');
+      }
+      await DraftModel.update(req.body, { where: { id: req.body.id } });
+      res.send('updated');
+    } catch (error) {
+      next(error);
+    }
+  });
   router.delete('/:id', authenticateAdmin, async (req, res, next) => {
     try {
       const {
         params: { id },
       } = req;
-      const news = await NewsModel.findOne({
+      const draft = await DraftModel.findOne({
         where: { id },
       });
-      if (!news) {
-        throw new HttpError(400, 'not found news');
+      if (!draft) {
+        throw new HttpError(400, 'not found draft');
       }
-
-      await news.destroy();
+      const news = await draft.getNews();
+      if (news) {
+        await news.destroy();
+      }
+      await draft.destroy();
       res.send('deleted');
     } catch (error) {
       next(error);
@@ -136,15 +202,15 @@ export const makeRouter = (sequelize: Sequelize, modelsStore: ModelsStore) => {
       const arr = await sequelize.query(
         `
           SELECT n.id, (${authorToJSON}) as author, ARRAY(${categoryToJSON}) as category, ARRAY(${tagsToJSON(
-          false,
+          true,
         )}) as tags,
             n."createdAt", n.title, n.content, n."topPhotoLink", n."photoLinks"
-          FROM "News" as n
+          FROM "Drafts" as n
           JOIN "Authors" as a ON a.id = n."authorId"
           JOIN "Users" as u ON a.id = u.id
           JOIN "Categories" as c ON c.id = n."categoryId"
           WHERE n.id = :id
-        `,
+          `,
         {
           replacements: {
             id: req.params.id,
@@ -153,11 +219,11 @@ export const makeRouter = (sequelize: Sequelize, modelsStore: ModelsStore) => {
           type: QueryTypes.SELECT,
         },
       );
-      const fullNews = arr[0];
-      if (!fullNews) {
+      const fullDraft = arr[0];
+      if (!fullDraft) {
         return res.status(404).send();
       }
-      res.json(fullNews);
+      res.json(fullDraft);
     } catch (error) {
       next(error);
     }
@@ -165,7 +231,7 @@ export const makeRouter = (sequelize: Sequelize, modelsStore: ModelsStore) => {
 
   router.get('/:id', async (req, res, next) => {
     try {
-      const news = await NewsModel.findOne({
+      const news = await DraftModel.findOne({
         where: { id: req.params.id },
         attributes: newsAttributes,
       });

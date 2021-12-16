@@ -39,6 +39,10 @@ export const getCategoryFromInstance = ({
 export const initialCategories: CreateCategory[] = [
   {
     parentCategoryId: null,
+    label: 'Новость',
+  },
+  {
+    parentCategoryId: null, // 2
     label: 'Политика',
   },
   {
@@ -46,7 +50,7 @@ export const initialCategories: CreateCategory[] = [
     label: 'Бизнес',
   },
   {
-    parentCategoryId: null,
+    parentCategoryId: null, // 4
     label: 'Здоровье',
   },
   {
@@ -54,15 +58,15 @@ export const initialCategories: CreateCategory[] = [
     label: 'Спорт',
   },
   {
-    parentCategoryId: 4,
+    parentCategoryId: 5, // 6
     label: 'Авто спорт',
   },
   {
-    parentCategoryId: 5,
+    parentCategoryId: 6,
     label: 'Формула 1',
   },
   {
-    parentCategoryId: 5,
+    parentCategoryId: 6, // 8
     label: 'Ралли спорт',
   },
 ];

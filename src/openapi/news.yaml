@@ -4,7 +4,7 @@ info:
   description: News
   version: 1.0.0
 paths:
-  /posts/:
+  /posts/full/:
     get:
       tags:
         - News
@@ -92,7 +92,7 @@ paths:
           required: true
           schema:
             type: integer
-            example: 5
+            example: 20
           description: The numbers of items to return
         - in: query
           name: offset
@@ -112,7 +112,39 @@ paths:
                 items:
                   $ref: "difinitions.yaml#/components/schemas/FullNews"
 
-  /posts/{id}:
+  /posts/:
+    get:
+      tags:
+        - News
+      summary: All available news
+      security:
+        - cookieAuth: []
+      parameters:
+        - in: query
+          name: offset
+          required: true
+          schema:
+            type: integer
+            example: 0
+          description: The number of items to skip before starting to collect the result set
+        - in: query
+          name: limit
+          required: true
+          schema:
+            type: integer
+            example: 20
+          description: The numbers of items to return
+      responses:
+        200:
+          description: A list of news.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "difinitions.yaml#/components/schemas/News"
+
+  /posts/full/{id}:
     get:
       tags:
         - News
@@ -132,109 +164,25 @@ paths:
               schema:
                $ref: "difinitions.yaml#/components/schemas/FullNews"
 
-  /posts/raw/:
+  /posts/{id}:
     get:
       tags:
         - News
-      summary: All available news (available only for admins)
-      security:
-        - cookieAuth: []
       parameters:
-        - in: query
-          name: offset
+        - in: path
+          name: id
           required: true
           schema:
             type: integer
-            example: 0
-          description: The number of items to skip before starting to collect the result set
-        - in: query
-          name: limit
-          required: true
-          schema:
-            type: integer
-            example: 5
-          description: The numbers of items to return
+            example: 1
+          description: Numeric ID of the news to get
       responses:
         200:
-          description: A list of news.
+          description: One post.
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: "difinitions.yaml#/components/schemas/News"
-
-  /posts/drafts/:
-    get:
-      tags:
-        - News
-      summary: my drafts
-      security:
-        - cookieAuth: []
-      parameters:
-        - in: query
-          name: offset
-          required: true
-          schema:
-            type: integer
-            example: 0
-          description: The number of items to skip before starting to collect the result set
-        - in: query
-          name: limit
-          required: true
-          schema:
-            type: integer
-            example: 5
-          description: The numbers of items to return
-      responses:
-        200:
-          description: A list of news.
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "difinitions.yaml#/components/schemas/News"
-
-    post:
-      tags:
-        - News
-      summary: Add a new News
-      security:
-        - cookieAuth: []
-      requestBody:
-        description: News create request
-        content:
-          application/json:
-            schema:
-              $ref: "difinitions.yaml#/components/schemas/CreateNews"
-        required: true
-      responses:
-        201:
-          description: Successful operation
-          content:
-            application/json:
-              schema:
-                $ref: "difinitions.yaml#/components/schemas/News"
-
-    patch:
-      tags:
-        - News
-      summary: Update News
-      security:
-        - cookieAuth: []
-      requestBody:
-        description: News update request
-        content:
-          application/json:
-            schema:
-              $ref: "difinitions.yaml#/components/schemas/News"
-        required: true
-      responses:
-        200:
-          description: Successful operation
-
-  /posts/drafts/{id}:
+               $ref: "difinitions.yaml#/components/schemas/News"
     delete:
       security:
         - cookieAuth: []
@@ -248,24 +196,6 @@ paths:
           schema: 
             type: integer
           description: News delete request
-      responses:
-        200:
-          description: Successful operation
-
-  /posts/drafts/publish/{id}:
-    get:
-      security:
-        - cookieAuth: []
-      tags:
-        - News
-      summary: publish News (available only for author)
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema: 
-            type: integer
-          description: News publish request
       responses:
         200:
           description: Successful operation
