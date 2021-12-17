@@ -537,19 +537,19 @@ paths:
           required: false
           schema:
             type: string
-            format: date
+            format: date-time
         - in: query
           name: created_at__lt
           required: false
           schema:
             type: string
-            format: date
+            format: date-time
         - in: query
           name: created_at__gt
           required: false
           schema:
             type: string
-            format: date
+            format: date-time
         - in: query
           name: searchText
           required: false
@@ -605,7 +605,7 @@ paths:
                       type: string
                     createdAt:
                       type: string
-                      format: date
+                      format: date-time
                       description: Creation date
                       example: '2021-01-30'
                     author:
@@ -764,7 +764,7 @@ paths:
                       required:
                         - title
                         - categoryId
-                        - tagsIds
+                        - tagIds
                         - content
                         - topPhotoLink
                         - photoLinks
@@ -774,7 +774,7 @@ paths:
                           type: integer
                         createdAt:
                           type: string
-                          format: date
+                          format: date-time
                           description: Creation date
                           example: '2021-01-30'
                         authorId:
@@ -809,7 +809,7 @@ paths:
                     type: string
                   createdAt:
                     type: string
-                    format: date
+                    format: date-time
                     description: Creation date
                     example: '2021-01-30'
                   author:
@@ -954,7 +954,7 @@ paths:
                     required:
                       - title
                       - categoryId
-                      - tagsIds
+                      - tagIds
                       - content
                       - topPhotoLink
                       - photoLinks
@@ -964,7 +964,7 @@ paths:
                         type: integer
                       createdAt:
                         type: string
-                        format: date
+                        format: date-time
                         description: Creation date
                         example: '2021-01-30'
                       authorId:
@@ -1029,7 +1029,7 @@ paths:
                       type: string
                     createdAt:
                       type: string
-                      format: date
+                      format: date-time
                       description: Creation date
                       example: '2021-01-30'
                     author:
@@ -1188,7 +1188,7 @@ paths:
                       required:
                         - title
                         - categoryId
-                        - tagsIds
+                        - tagIds
                         - content
                         - topPhotoLink
                         - photoLinks
@@ -1198,7 +1198,7 @@ paths:
                           type: integer
                         createdAt:
                           type: string
-                          format: date
+                          format: date-time
                           description: Creation date
                           example: '2021-01-30'
                         authorId:
@@ -1245,7 +1245,7 @@ paths:
               required:
                 - title
                 - categoryId
-                - tagsIds
+                - tagIds
                 - content
                 - topPhotoLink
                 - photoLinks
@@ -1284,7 +1284,7 @@ paths:
                     required:
                       - title
                       - categoryId
-                      - tagsIds
+                      - tagIds
                       - content
                       - topPhotoLink
                       - photoLinks
@@ -1294,7 +1294,7 @@ paths:
                         type: integer
                       createdAt:
                         type: string
-                        format: date
+                        format: date-time
                         description: Creation date
                         example: '2021-01-30'
                       authorId:
@@ -1342,7 +1342,7 @@ paths:
                   required:
                     - title
                     - categoryId
-                    - tagsIds
+                    - tagIds
                     - content
                     - topPhotoLink
                     - photoLinks
@@ -1352,7 +1352,7 @@ paths:
                       type: integer
                     createdAt:
                       type: string
-                      format: date
+                      format: date-time
                       description: Creation date
                       example: '2021-01-30'
                     authorId:
@@ -1392,7 +1392,7 @@ paths:
                     type: string
                   createdAt:
                     type: string
-                    format: date
+                    format: date-time
                     description: Creation date
                     example: '2021-01-30'
                   author:
@@ -1538,7 +1538,7 @@ paths:
                     required:
                       - title
                       - categoryId
-                      - tagsIds
+                      - tagIds
                       - content
                       - topPhotoLink
                       - photoLinks
@@ -1548,7 +1548,7 @@ paths:
                         type: integer
                       createdAt:
                         type: string
-                        format: date
+                        format: date-time
                         description: Creation date
                         example: '2021-01-30'
                       authorId:
@@ -1628,7 +1628,7 @@ paths:
                               type: number
                             createdAt:
                               type: string
-                              format: date
+                              format: date-time
                               description: Creation date
                               example: '2021-01-30'
                           required:
@@ -1717,7 +1717,7 @@ paths:
                           type: number
                         createdAt:
                           type: string
-                          format: date
+                          format: date-time
                           description: Creation date
                           example: '2021-01-30'
                       required:
@@ -1771,7 +1771,7 @@ paths:
                         type: number
                       createdAt:
                         type: string
-                        format: date
+                        format: date-time
                         description: Creation date
                         example: '2021-01-30'
                     required:
@@ -1811,7 +1811,7 @@ paths:
                       type: number
                     createdAt:
                       type: string
-                      format: date
+                      format: date-time
                       description: Creation date
                       example: '2021-01-30'
                   required:

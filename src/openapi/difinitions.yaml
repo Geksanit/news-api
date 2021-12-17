@@ -176,7 +176,7 @@ components:
               type: integer
             createdAt:
               type: string
-              format: date
+              format: date-time
               description: Creation date
               example: "2021-01-30"
             authorId:
@@ -213,7 +213,7 @@ components:
       required:
         - title
         - categoryId
-        - tagsIds
+        - tagIds
         - content
         - topPhotoLink
         - photoLinks
@@ -226,7 +226,7 @@ components:
           type: string
         createdAt:
           type: string
-          format: date
+          format: date-time
           description: Creation date
           example: "2021-01-30"
         author:
@@ -288,7 +288,7 @@ components:
               type: number
             createdAt:
               type: string
-              format: date
+              format: date-time
               description: Creation date
               example: "2021-01-30"
           required:

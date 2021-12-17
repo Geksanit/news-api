@@ -97,15 +97,22 @@ export const makeRouter = (sequelize: Sequelize, modelsStore: ModelsStore) => {
     }
   });
 
-  router.get('/publish/:id', authenticateAdmin, async (req, res, next) => {
+  router.get('/publish/:id', authenticateUser, async (req, res, next) => {
     try {
+      const user = req.user as UserView;
+      const author = await AuthorModel.findOne({
+        where: { id: user.id },
+      });
+      if (!author) {
+        throw new HttpError(400, 'author not found');
+      }
       const {
         params: { id },
       } = req;
       const draft = await DraftModel.findOne({
         where: { id },
       });
-      if (!draft) {
+      if (!draft || draft.authorId !== author.id) {
         throw new HttpError(400, 'not found draft');
       }
       const tags = await draft.getTags();
@@ -120,6 +127,7 @@ export const makeRouter = (sequelize: Sequelize, modelsStore: ModelsStore) => {
         await newNews.addTags(tags);
       }
       res.status(201);
+      res.send({ res: 'success' });
     } catch (error) {
       next(error);
     }
@@ -162,15 +170,15 @@ export const makeRouter = (sequelize: Sequelize, modelsStore: ModelsStore) => {
       const user = req.user as UserView;
       const updatedNews = req.body as News;
       const author = await AuthorModel.findOne({ where: { userId: user.id } });
-      if (!author) {
+      if (!author || updatedNews.authorId !== author.id) {
         throw new HttpError(400, 'user is not author');
       }
-      const news = await DraftModel.findOne({ where: { id: updatedNews } });
+      const news = await DraftModel.findOne({ where: { id: updatedNews.id } });
       if (!news || user.id !== news.authorId) {
         throw new HttpError(400, 'not found draft');
       }
       await DraftModel.update(req.body, { where: { id: req.body.id } });
-      res.send('updated');
+      res.send({ res: 'updated' });
     } catch (error) {
       next(error);
     }
@@ -191,7 +199,7 @@ export const makeRouter = (sequelize: Sequelize, modelsStore: ModelsStore) => {
         await news.destroy();
       }
       await draft.destroy();
-      res.send('deleted');
+      res.send({ res: 'deleted' });
     } catch (error) {
       next(error);
     }

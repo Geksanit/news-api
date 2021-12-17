@@ -56,19 +56,19 @@ paths:
           required: false
           schema:
             type: string
-            format: date
+            format: date-time
         - in: query
           name: created_at__lt
           required: false
           schema:
             type: string
-            format: date # express-openapi-validator fail validation
+            format: date-time # express-openapi-validator fail validation
         - in: query
           name: created_at__gt
           required: false
           schema:
             type: string
-            format: date
+            format: date-time
         - in: query
           name: searchText
           required: false
